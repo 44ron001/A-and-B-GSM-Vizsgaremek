@@ -5,6 +5,6 @@ A pc alkatrész weboldalunk található itt, nodejs + react + mysql backendel k�
 
 `cd Webshop`
 
-`npm init`
+`npm install`
 
 `npm run dev`
