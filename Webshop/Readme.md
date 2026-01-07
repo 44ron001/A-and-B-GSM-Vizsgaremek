@@ -3,8 +3,8 @@ A pc alkatrész weboldalunk található itt, nodejs + react + mysql backendel k�
 
 ## Hogyan kell futtatni:
 
-`cd Webshop`
+`cd Webshop` <= menjünk bele a projekt könyvtárába
 
-`npm install`
+`npm install` <= szükséges könyvtárak telepítése
 
-`npm run dev`
+`npm run dev` <= futtasuk lokális szerveren
