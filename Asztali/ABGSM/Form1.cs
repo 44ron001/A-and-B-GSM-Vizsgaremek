@@ -15,6 +15,7 @@ namespace ABGSM
         public Form1()
         {
             InitializeComponent();
+            
         }
     }
 }
