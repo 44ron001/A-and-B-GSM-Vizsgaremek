@@ -5,7 +5,7 @@
 - Uhrin Bence
 
 ### Célcsoport
-- Webshopunk sok célcsoportot kiszolgálhat, mint például: Gamerek, Crypto bányászok, cégeknek
+- Webshopunk sok célcsoportot kiszolgálhat, mint például: Gamerek, Crypto bányászok, cégek.
 
 ## Adatbázis
 ![Diagram](/adatbázis/diagram.jpg)
