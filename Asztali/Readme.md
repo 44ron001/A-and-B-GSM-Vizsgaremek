@@ -5,4 +5,4 @@ A pc alkatrész rendelés és leltár kezelő alkalmazása található itt, kés
 
 `dotnet Asztali` <= menjünk bele a projekt könyvtárába
 
-`dotnet run` <= szükséges könyvtárak telepítése
+`dotnet run` <= alkalmazás indítása
