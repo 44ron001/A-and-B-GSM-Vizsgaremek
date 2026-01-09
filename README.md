@@ -1,8 +1,8 @@
 # A&B GSM
 ## Infó
 ### Készítők
-- Mohacsek Áron
-- Uhrin Bence
+- Mohacsek Áron: **Weboldal + Adatbázis**
+- Uhrin Bence: **Alkalmazás + Adatbázis**
 
 ### Célcsoport
 - Webshopunk sok célcsoportot kiszolgálhat, mint például: Gamerek, Crypto bányászok, cégek.
