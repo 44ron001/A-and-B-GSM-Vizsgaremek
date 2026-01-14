@@ -1,1 +1,11 @@
 C:\Users\moharo043\Desktop\ABGSM\ABGSM\obj\Debug\ABGSM.csproj.AssemblyReference.cache
+C:\Users\uhrben042\Desktop\vizsgaremek\A-and-B-GSM-Vizsgaremek\Asztali\ABGSM\bin\Debug\ABGSM.exe.config
+C:\Users\uhrben042\Desktop\vizsgaremek\A-and-B-GSM-Vizsgaremek\Asztali\ABGSM\bin\Debug\ABGSM.exe
+C:\Users\uhrben042\Desktop\vizsgaremek\A-and-B-GSM-Vizsgaremek\Asztali\ABGSM\bin\Debug\ABGSM.pdb
+C:\Users\uhrben042\Desktop\vizsgaremek\A-and-B-GSM-Vizsgaremek\Asztali\ABGSM\obj\Debug\ABGSM.csproj.AssemblyReference.cache
+C:\Users\uhrben042\Desktop\vizsgaremek\A-and-B-GSM-Vizsgaremek\Asztali\ABGSM\obj\Debug\ABGSM.Form1.resources
+C:\Users\uhrben042\Desktop\vizsgaremek\A-and-B-GSM-Vizsgaremek\Asztali\ABGSM\obj\Debug\ABGSM.Properties.Resources.resources
+C:\Users\uhrben042\Desktop\vizsgaremek\A-and-B-GSM-Vizsgaremek\Asztali\ABGSM\obj\Debug\ABGSM.csproj.GenerateResource.cache
+C:\Users\uhrben042\Desktop\vizsgaremek\A-and-B-GSM-Vizsgaremek\Asztali\ABGSM\obj\Debug\ABGSM.csproj.CoreCompileInputs.cache
+C:\Users\uhrben042\Desktop\vizsgaremek\A-and-B-GSM-Vizsgaremek\Asztali\ABGSM\obj\Debug\ABGSM.exe
+C:\Users\uhrben042\Desktop\vizsgaremek\A-and-B-GSM-Vizsgaremek\Asztali\ABGSM\obj\Debug\ABGSM.pdb
