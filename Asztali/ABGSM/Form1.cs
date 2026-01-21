@@ -12,19 +12,52 @@ namespace ABGSM
 {
     public partial class Form1 : Form
     {
+        public bool isLoggedIn = false;
+
         public Form1()
         {
             InitializeComponent();
-            
-            this.Size = new Size(1280, 720);
-            this.StartPosition = FormStartPosition.CenterScreen;
+        }
 
-            Button button1 = new Button();
-            button1.Text = "Belepes";
-            button1.Size = new Size(200, 50);
-            button1.Location = new Point(300, 200);
-            button1.Visible = true;
-            this.Controls.Add(button1);
+        private void label1_Click(object sender, EventArgs e)
+        {
+            string username = textBox1.Text;
+            MessageBox.Show("Welcome " + username + " to A&B GSM!");
+            isLoggedIn = true;
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            LoggedInCheck();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            LoggedInCheck();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            LoggedInCheck();
+        }
+
+        public void LoggedInCheck()
+        {
+            if (!isLoggedIn)
+            {
+                MessageBox.Show("Please log in first.");
+                return;
+            }
         }
     }
 }
