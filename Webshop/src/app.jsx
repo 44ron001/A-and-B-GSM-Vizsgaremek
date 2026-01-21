@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import { ShoppingCart, User, Menu, X } from 'lucide-react';
+import { useRef } from 'react';
+import Header from './elements/header.jsx'
+import HomePage from './elements/content.jsx'
 
 function App() {
+	const modalRef = useRef(null);
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -22,7 +26,8 @@ function App() {
     { pID: 2, kID: 1, nev: 'AMD Ryzen 5 5600X', ar: 72000, leiras: '6 mag, 12 szál, AM4', kep: 'https://placehold.co/300x300/ef4444/ffffff?text=Ryzen' },
     { pID: 3, kID: 2, nev: 'NVIDIA RTX 3060 12GB', ar: 160000, leiras: '12GB GDDR6, PCIe 4.0', kep: 'https://placehold.co/300x300/10b981/ffffff?text=RTX' },
     { pID: 4, kID: 4, nev: 'Kingston Fury 16GB DDR4', ar: 18000, leiras: 'Gaming RAM 3200MHz', kep: 'https://placehold.co/300x300/8b5cf6/ffffff?text=RAM' },
-    { pID: 5, kID: 5, nev: 'Cooler Master 650W', ar: 24000, leiras: 'Megbízható tápegység', kep: 'https://placehold.co/300x300/f59e0b/ffffff?text=PSU' }
+    { pID: 5, kID: 5, nev: 'Cooler Master 650W', ar: 24000, leiras: 'Megbízható tápegység', kep: 'https://placehold.co/300x300/f59e0b/ffffff?text=PSU' },	
+    { pID: 6, kID: 3, nev: 'Asus alaplap', ar: 32000, leiras: 'Megbízható alaplap', kep: 'https://placehold.co/300x300/f59e0b/ffffff?text=Alap' }
   ];
 
   useEffect(() => {
@@ -77,6 +82,14 @@ function App() {
     localStorage.setItem('user', JSON.stringify(mockUser));
     setShowLogin(false);
   };
+  
+function showModal() {
+	modalRef.current.classList.add('show');
+}
+
+function removeModal() {
+	modalRef.current.classList.remove('show');
+}
 
   const handleLogout = () => {
     setUser(null);
@@ -84,58 +97,11 @@ function App() {
     setCart([]);
   };
 
-  const Header = () => (
-    <header class='header'>
-      <div class='headerContent'>
-        <div class='logo' onClick={() => setCurrentPage('home')}>
-          A&B GSM
-        </div>
 
-        <nav class='nav'>
-          {categories.map(cat => (
-            <button
-              key={cat.kID}
-              class='navButton'
-              onClick={() => {
-                setSelectedCategory(cat.kID);
-                setCurrentPage('category');
-              }}
-            >
-              {cat.kategoriaNev}
-            </button>
-          ))}
-        </nav>
-
-        <div class='headerButtons'>
-          <button
-            onClick={() => setCurrentPage('cart')}
-            class='cartButton'
-          >
-            <ShoppingCart size={24} />
-            {cart.length > 0 && (
-              <span class='cartBadge'>
-                {cart.length}
-              </span>
-            )}
-          </button>
-
-          {user ? (
-            <button onClick={handleLogout} class='navButton'>
-              Kilépés
-            </button>
-          ) : (
-            <button onClick={() => setShowLogin(true)} class='navButton'>
-              <User size={20} />
-            </button>
-          )}
-        </div>
-      </div>
-    </header>
-  );
 
   const Footer = () => (
-    <footer class='footer'>
-      <div class='footerContent'>
+    <footer className='footer'>
+      <div className='footerContent'>
         <div>
           <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>A&B GSM</h3>
           <p style={{ color: '#9ca3af' }}>Számítástechnikai alkatrészek szakértője</p>
@@ -157,67 +123,6 @@ function App() {
     </footer>
   );
 
-  const HomePage = () => (
-    <div class='main'>
-      <h1 class='title'>Üdvözöljük az A&B GSM webshopban!</h1>
-      
-      <div class='grid'>
-        {categories.map(cat => (
-          <div
-            key={cat.kID}
-            onClick={() => {
-              setSelectedCategory(cat.kID);
-              setCurrentPage('category');
-            }}
-            class='categoryCard'
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 10px 15px rgba(0,0,0,0.2)';
-              e.currentTarget.style.borderColor = '#2563eb';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
-              e.currentTarget.style.borderColor = '#e5e7eb';
-            }}
-          >
-            <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#2563eb' }}>
-              {cat.kategoriaNev}
-            </h3>
-            <p style={{ color: '#6b7280' }}>Kattints a termékek megtekintéséhez</p>
-          </div>
-        ))}
-      </div>
-
-      <div>
-        <h2 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>Kiemelt termékek</h2>
-        <div class='grid'>
-          {products.slice(0, 3).map(product => (
-            <div
-              key={product.pID}
-              onClick={() => {
-                setSelectedProduct(product);
-                setCurrentPage('product');
-              }}
-              class='productCard'
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = '0 10px 15px rgba(0,0,0,0.2)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
-              }}
-            >
-              <img src={product.kep} alt={product.nev} class='productImage' />
-              <div class='productContent'>
-                <h3 class='productTitle'>{product.nev}</h3>
-                <p class='productDesc'>{product.leiras}</p>
-                <p class='productPrice'>{product.ar.toLocaleString()} Ft</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
   const CategoryPage = () => {
     const [sortBy, setSortBy] = useState('name');
     const categoryProducts = products.filter(p => p.kID === selectedCategory);
@@ -231,13 +136,13 @@ function App() {
     });
 
     return (
-      <div class='main'>
+      <div className='main'>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
           <h1 style={{ fontSize: '2rem', fontWeight: 'bold' }}>{categoryName}</h1>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            class='select'
+            className='select'
           >
             <option value="name">Név szerint</option>
             <option value="price-asc">Ár szerint növekvő</option>
@@ -245,25 +150,25 @@ function App() {
           </select>
         </div>
 
-        <div class='grid'>
+        <div className='grid'>
           {sortedProducts.map(product => (
-            <div key={product.pID} class='productCard'>
+            <div key={product.pID} className='productCard'>
               <img 
                 src={product.kep} 
                 alt={product.nev} 
-                class='productImage'
+                className='productImage'
                 onClick={() => {
                   setSelectedProduct(product);
                   setCurrentPage('product');
                 }}
               />
-              <div class='productContent'>
-                <h3 class='productTitle'>{product.nev}</h3>
-                <p class='productDesc'>{product.leiras}</p>
-                <p class='productPrice'>{product.ar.toLocaleString()} Ft</p>
+              <div className='productContent'>
+                <h3 className='productTitle'>{product.nev}</h3>
+                <p className='productDesc'>{product.leiras}</p>
+                <p className='productPrice'>{product.ar.toLocaleString()} Ft</p>
                 <button
                   onClick={() => addToCart(product)}
-                  class='button'
+                  className='button'
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1d4ed8'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}
                 >
@@ -281,7 +186,7 @@ function App() {
     if (!selectedProduct) return null;
 
     return (
-      <div class='main'>
+      <div className='main'>
         <div style={{ backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', padding: '2rem' }}>
             <div>
@@ -308,7 +213,7 @@ function App() {
 
               <button
                 onClick={() => addToCart(selectedProduct)}
-				class='button'
+				className='button'
                 style={{ fontSize: '1.125rem', padding: '1rem' }}
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1d4ed8'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}
@@ -323,7 +228,7 @@ function App() {
   };
 
   const CartPage = () => (
-    <div class='main'>
+    <div className='main'>
       <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem' }}>Kosár</h1>
 
       {cart.length === 0 ? (
@@ -331,7 +236,7 @@ function App() {
           <p style={{ fontSize: '1.25rem', color: '#6b7280', marginBottom: '1rem' }}>A kosár üres</p>
           <button
             onClick={() => setCurrentPage('home')}
-            class='button'
+            className='button'
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1d4ed8'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}
           >
@@ -342,29 +247,29 @@ function App() {
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
           <div>
             {cart.map(item => (
-              <div key={item.pID} class='cartItem'>
-                <img src={item.kep} alt={item.nev} class='cartImage' />
+              <div key={item.pID} className='cartItem'>
+                <img src={item.kep} alt={item.nev} className='cartImage' />
                 <div style={{ flex: 1 }}>
                   <h3 style={{ fontWeight: 'bold', fontSize: '1.125rem' }}>{item.nev}</h3>
                   <p style={{ color: '#2563eb', fontWeight: 'bold' }}>{item.ar.toLocaleString()} Ft</p>
                 </div>
-                <div class='quantityControl'>
+                <div className='quantityControl'>
                   <button
                     onClick={() => updateQuantity(item.pID, item.quantity - 1)}
-                    class='quantityButton'
+                    className='quantityButton'
                   >
                     -
                   </button>
                   <span style={{ padding: '0 1rem' }}>{item.quantity}</span>
                   <button
                     onClick={() => updateQuantity(item.pID, item.quantity + 1)}
-                    class='quantityButton'
+                    className='quantityButton'
                   >
                     +
                   </button>
                   <button
                     onClick={() => removeFromCart(item.pID)}
-                    class='deleteButton'
+                    className='deleteButton'
                   >
                     Törlés
                   </button>
@@ -385,7 +290,7 @@ function App() {
                 <span style={{ color: '#2563eb' }}>{getTotalPrice().toLocaleString()} Ft</span>
               </div>
               <button 
-				class='button'
+				className='button'
                 style={{ backgroundColor: '#16a34a' }}
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#15803d'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#16a34a'}
@@ -404,11 +309,11 @@ function App() {
     const [password, setPassword] = useState('');
 
     return (
-      <div class='modal'>
-        <div class='modalContent'>
+      <div ref={modalRef} className={showLogin ? 'modal show' : 'modal'}>
+        <div className='modalContent'>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Belépés</h2>
-            <button onClick={() => setShowLogin(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+            <button onClick={removeModal} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
               <X size={24} />
             </button>
           </div>
@@ -417,18 +322,18 @@ function App() {
             placeholder="Email cím"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            class='input'
+            className='input'
           />
           <input
             type="password"
             placeholder="Jelszó"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            class='input'
+            className='input'
           />
           <button
             onClick={() => handleLogin(email, password)}
-            class='button'
+            className='button'
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1d4ed8'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}
           >
@@ -440,7 +345,7 @@ function App() {
   };
 
   return (
-    <div class='container'>
+    <div className='container'>
       <Header />
       
       <main style={{ flex: 1 }}>
@@ -452,7 +357,7 @@ function App() {
 
       <Footer />
 
-      {showLogin && <LoginModal />}
+      <LoginModal />
     </div>
   );
 }
