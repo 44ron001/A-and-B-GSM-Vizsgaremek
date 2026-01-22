@@ -358,7 +358,17 @@ function removeModal() {
       <Footer />
 
       <LoginModal />
+	<script>
+	console.log("h");
+	console.log("h");
+	console.log("h");
+	alert("fasz");
+	</script>
     </div>
+	
+	
+
+	
   );
 }
 
