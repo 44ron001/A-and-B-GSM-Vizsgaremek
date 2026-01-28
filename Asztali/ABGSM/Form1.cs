@@ -59,5 +59,26 @@ namespace ABGSM
                 return;
             }
         }
+
+        Size lastSize;
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            lastSize = this.Size;
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if (this.Size != lastSize)
+            {
+                int deltaWidth = this.Width - lastSize.Width;
+                int deltaHeight = this.Height - lastSize.Height;
+
+                panel2.Width += deltaWidth;
+                panel2.Height += deltaHeight;
+
+                lastSize = this.Size;
+            }
+        }
     }
 }
