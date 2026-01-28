@@ -24,6 +24,14 @@ namespace ABGSM
             string username = textBox1.Text;
             MessageBox.Show("Welcome " + username + " to A&B GSM!");
             isLoggedIn = true;
+            button1.Visible = false;
+            textBox1.Visible = false;
+            textBox2.Visible = false;
+            label2.Text = "User";
+            label3.Visible = false;
+            label4.Visible = false;
+            label5.Visible = true;
+            label5.Text = "| username: \n" + "| " + username;
         }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
