@@ -47,6 +47,12 @@ namespace ABGSM
         private void button2_Click(object sender, EventArgs e)
         {
             LoggedInCheck();
+            if (isLoggedIn) 
+            {
+                Form2 form2 = new Form2();
+                form2.Show();
+                this.Hide();
+            };
         }
 
         private void button3_Click(object sender, EventArgs e)
