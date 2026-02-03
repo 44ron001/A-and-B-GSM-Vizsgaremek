@@ -33,13 +33,46 @@ namespace ABGSM
 
                     while (reader.Read())
                     {
-                        listBox1.Items.Add(reader["nev"].ToString());
+                        listBox1.Items.Add(reader["pID"].ToString() + ";" + reader["nev"].ToString());
                     }
                 }
             }
+        }
 
-            
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (listBox1.SelectedItem == null)
+            {
+                MessageBox.Show("Select an item first!");
+                return;
+            }
 
+            string selected = listBox1.SelectedItem.ToString();
+
+            MessageBox.Show(selected);
+
+
+            int productId = int.Parse(selected.Split(';')[0].Trim());
+
+            using (MySqlConnection conn = new MySqlConnection(
+                "server=localhost;uid=root;database=pcshop;port=3307;pwd=;"))
+            {
+                conn.Open();
+
+                string sql = "DELETE FROM products WHERE pID = @pID";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@pID", productId);
+
+                cmd.ExecuteNonQuery();
+            }
+
+            listBox1.Items.Remove(listBox1.SelectedItem);
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Form3 form3 = new Form3();
+            form3.Show();
         }
     }
 }
