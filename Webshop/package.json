@@ -5,7 +5,7 @@
   "description": "A pc alkatrész weboldalunk található itt, nodejs + react + mysql backendel készítve!",
   "license": "ISC",
   "author": "",
-  "type": "module",
+  "type": "commonjs",
   "main": "eslint.config.js",
   "scripts": {
     "dev": "vite",
@@ -14,7 +14,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
     "lucide-react": "^0.562.0",
+    "mysql2": "^3.16.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.12.0"
