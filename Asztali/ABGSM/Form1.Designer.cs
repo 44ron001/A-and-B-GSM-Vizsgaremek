@@ -249,8 +249,9 @@
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(251, 73);
             this.button7.TabIndex = 3;
-            this.button7.Text = "XX";
+            this.button7.Text = "Stock";
             this.button7.UseVisualStyleBackColor = true;
+            this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
             // Form1
             // 

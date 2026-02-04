@@ -77,6 +77,17 @@ namespace ABGSM
             };
         }
 
+        private void button7_Click(object sender, EventArgs e)
+        {
+            LoggedInCheck();
+            if (isLoggedIn)
+            {
+                Form5 form5 = new Form5();
+                form5.Show();
+                this.Hide();
+            };
+        }
+
         public void LoggedInCheck()
         {
             if (!isLoggedIn)
