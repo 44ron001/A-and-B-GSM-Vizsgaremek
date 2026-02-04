@@ -64,7 +64,7 @@
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(337, 101);
             this.button2.TabIndex = 2;
-            this.button2.Text = "INSERT";
+            this.button2.Text = "XX";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 

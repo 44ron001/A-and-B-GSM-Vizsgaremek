@@ -33,7 +33,7 @@ namespace ABGSM
 
                     while (reader.Read())
                     {
-                        listBox1.Items.Add(reader["pID"].ToString() + ";" + reader["nev"].ToString());
+                        listBox1.Items.Add(reader["pID"].ToString() + "; " + reader["nev"].ToString());
                     }
                 }
             }
@@ -71,8 +71,7 @@ namespace ABGSM
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Form3 form3 = new Form3();
-            form3.Show();
+
         }
     }
 }

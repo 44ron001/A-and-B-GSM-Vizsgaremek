@@ -11,20 +11,22 @@ using MySql.Data.MySqlClient;
 
 namespace ABGSM
 {
-    public partial class Form3 : Form
+    public partial class Form4 : Form
     {
-        public Form3()
+        public Form4()
         {
             InitializeComponent();
         }
 
-        private void Form3_Load(object sender, EventArgs e)
+        private void Form4_Load(object sender, EventArgs e)
         {
             using (MySqlConnection conn = new MySqlConnection("server=localhost;uid=root;database=pcshop;port=3307;pwd=;"))
             {
                 conn.Open();
 
-                string sql = "SELECT * FROM users";
+                string sql = "SELECT users.nev AS nev, products.nev AS nev2, orders.datum AS date, orders.allapot AS detail FROM `orders` " +
+                    "\r\nINNER JOIN users ON users.userID = orders.userID \r\nINNER JOIN order_items ON order_items.orderID = orders.orderID" +
+                    "\r\nINNER JOIN products ON products.pID = order_items.pID";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
 
                 using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -33,13 +35,13 @@ namespace ABGSM
 
                     while (reader.Read())
                     {
-                        listBox1.Items.Add(reader["nev"].ToString() + " - " + reader["telefon"].ToString() + " - " + reader["email"].ToString());
+                        listBox1.Items.Add(reader["nev"].ToString() + " ; " + reader["nev2"].ToString() + " ; " + reader["date"].ToString() + " ; " + reader["detail"].ToString());
                     }
                 }
             }
         }
 
-        private void label2_Click(object sender, EventArgs e)
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }
