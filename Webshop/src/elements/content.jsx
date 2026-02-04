@@ -40,19 +40,35 @@ function HomePage() {
 			<div className='category_list'>
 				<div className='category'>
 					<img className='category_image' src='./src/images/gpu.png'/>
-					<p className='category_name'>VIDEÓKÁRTYÁK</p>
+					<p className='category_name'>VIDEOCARDS</p>
 				</div>
 				<div className='category'>
 					<img className='category_image' src='./src/images/cpu.png'/>
-					<p className='category_name'>PROCESSZOROK</p>
+					<p className='category_name'>PROCESSORS</p>
 				</div>
 				<div className='category'>
 					<img className='category_image' src='./src/images/pc.png'/>
-					<p className='category_name'>GÉPHÁZAK</p>
+					<p className='category_name'>PC CASES</p>
 				</div>
 				<div className='category'>
 					<img className='category_image' src='./src/images/monitor.png'/>
-					<p className='category_name'>MONITOROK</p>
+					<p className='category_name'>MONITORS</p>
+				</div>
+				<div className='category'>
+					<img className='category_image' src='./src/images/motherboard.png'/>
+					<p className='category_name'>MOTHERBOARDS</p>
+				</div>
+				<div className='category'>
+					<img className='category_image' src='./src/images/psu.png'/>
+					<p className='category_name'>PSU</p>
+				</div>
+				<div className='category'>
+					<img className='category_image' src='./src/images/memory.png'/>
+					<p className='category_name'>RAM</p>
+				</div>
+				<div className='category'>
+					<img className='category_image' src='./src/images/cooler.png'/>
+					<p className='category_name'>COOLER</p>
 				</div>
 			</div>
 		</div>

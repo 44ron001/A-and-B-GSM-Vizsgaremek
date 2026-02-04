@@ -11,6 +11,7 @@ function Header() {
 			<a className='header_link' href='https://www.google.com'>PROCESSZOROK</a>
 			<a className='header_link' href='https://www.google.com'>GÉPHÁZAK</a>
 			<a className='header_link' href='https://www.google.com'>MONITOROK</a>
+			<input type="search" className="search" placeholder="Search..." />
 			<img className='user' src='./src/images/account.png'/>
 		</div>
     </header>
