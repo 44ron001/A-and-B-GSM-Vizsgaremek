@@ -8,7 +8,7 @@
 - Webshopunk sok célcsoportot kiszolgálhat, mint például: Gamerek, Crypto bányászok, cégek.
 
 ## Adatbázis
-![Diagram](/adatbázis/diagram.jpg)
+![Diagram](/adatbazis/diagram.jpg)
 
 ---
 
