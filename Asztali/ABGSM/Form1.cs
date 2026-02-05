@@ -51,7 +51,6 @@ namespace ABGSM
             {
                 Form2 form2 = new Form2();
                 form2.Show();
-                this.Hide();
             };
         }
 
@@ -62,7 +61,6 @@ namespace ABGSM
             {
                 Form3 form3 = new Form3();
                 form3.Show();
-                this.Hide();
             };
         }
 
@@ -73,7 +71,6 @@ namespace ABGSM
             {
                 Form4 form4 = new Form4();
                 form4.Show();
-                this.Hide();
             };
         }
 
@@ -84,7 +81,6 @@ namespace ABGSM
             {
                 Form5 form5 = new Form5();
                 form5.Show();
-                this.Hide();
             };
         }
 
