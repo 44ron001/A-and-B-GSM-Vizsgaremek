@@ -25,3 +25,32 @@
 | **orders**             | orderID, userID, fizID, datum, allapot                                   | PK: orderID, FK: userID → users.userID, FK: fizID → payments.fizID    |
 | **order_items**        | orderItemID, orderID, pID, darab, ar_akkor                               | PK: orderItemID, FK: orderID → orders.orderID, FK: pID → products.pID |
 ---
+
+
+
+## API Endpoints
+
+| Method | Endpoint                  | Leírás                              | Paraméterek | Válasz |
+|--------|---------------------------|-------------------------------------|-------------|--------|
+| GET    | /api/products/:categoryId | Termékek lekérése kategória alapján | categoryId (path) – a kategória azonosítója | JSON objektum termékekkel |
+
+### Válasz példa
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "pID": 1,
+      "nev": "Gaming PC",
+      "ar": 450000,
+      "keszlet": 3,
+      "attributes": { 
+        /* további termék tulajdonságok */
+      },
+      "images": [ 
+        /* képek listája */
+      ]
+    }
+  ]
+}
