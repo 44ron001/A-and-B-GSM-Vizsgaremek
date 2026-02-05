@@ -11,8 +11,9 @@
 ![Diagram](/adatbazis/diagram.jpg)
 
 ## Adatbázis 2.0 (legfrissebb)
+#### Entity-attribute-value model
 ![Diagram](/adatbazis/diagram2.jpg)
-Entity-attribute-value model
+
 ---
 
 ## **Entitáslista (táblák és mezők)**
