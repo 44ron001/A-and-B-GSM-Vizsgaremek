@@ -1,8 +1,8 @@
 # A&B GSM
 ## Infó
 ### Készítők
-- Mohacsek Áron: **Weboldal + Adatbázis**
-- Uhrin Bence: **Alkalmazás + Adatbázis**
+- Mohacsek Áron: **Frontend(reactjs) + Adatbázis(mysql) + Backend(nodejs)**
+- Uhrin Bence: **Alkalmazás(winforms) + Adatbázis(mysql) + Backend(nodejs)**
 
 ### Célcsoport
 - Webshopunk sok célcsoportot kiszolgálhat, mint például: Gamerek, Crypto bányászok, cégek.
