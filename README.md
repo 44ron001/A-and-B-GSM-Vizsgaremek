@@ -7,8 +7,11 @@
 ### Célcsoport
 - Webshopunk sok célcsoportot kiszolgálhat, mint például: Gamerek, Crypto bányászok, cégek.
 
-## Adatbázis
+## Adatbázis 1.0
 ![Diagram](/adatbazis/diagram.jpg)
+
+## Adatbázis 2.0 (legfrissebb)
+![Diagram](/adatbazis/diagram2.jpg)
 
 ---
 
@@ -45,11 +48,14 @@
       "nev": "Gaming PC",
       "ar": 450000,
       "keszlet": 3,
-      "attributes": { 
+      "attributes": {
         /* további termék tulajdonságok */
       },
-      "images": [ 
-        /* képek listája */
+      "images": [
+        {
+          "imageId": 12,
+          "base64": "iVBORw0KGgoAAAANSUhEUgAA..."
+        }
       ]
     }
   ]
