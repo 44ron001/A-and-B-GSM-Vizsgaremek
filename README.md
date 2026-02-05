@@ -12,7 +12,7 @@
 
 ## Adatbázis 2.0 (legfrissebb)
 ![Diagram](/adatbazis/diagram2.jpg)
-
+Entity-attribute-value model
 ---
 
 ## **Entitáslista (táblák és mezők)**
