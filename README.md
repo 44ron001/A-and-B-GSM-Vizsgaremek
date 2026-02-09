@@ -1,14 +1,18 @@
 # A&B GSM
 ## Infó
 ### Készítők
-- Mohacsek Áron: **Weboldal + Adatbázis**
-- Uhrin Bence: **Alkalmazás + Adatbázis**
+- Mohacsek Áron: **Frontend(reactjs) + Adatbázis(mysql) + Backend(nodejs)**
+- Uhrin Bence: **Alkalmazás(winforms) + Adatbázis(mysql) + Backend(nodejs)**
 
 ### Célcsoport
 - Webshopunk sok célcsoportot kiszolgálhat, mint például: Gamerek, Crypto bányászok, cégek.
 
-## Adatbázis
+## Adatbázis 1.0
 ![Diagram](/adatbazis/diagram.jpg)
+
+## Adatbázis 2.0 (legfrissebb)
+#### Entity-attribute-value model
+![Diagram](/adatbazis/diagram2.jpg)
 
 ---
 
@@ -25,3 +29,35 @@
 | **orders**             | orderID, userID, fizID, datum, allapot                                   | PK: orderID, FK: userID → users.userID, FK: fizID → payments.fizID    |
 | **order_items**        | orderItemID, orderID, pID, darab, ar_akkor                               | PK: orderItemID, FK: orderID → orders.orderID, FK: pID → products.pID |
 ---
+
+
+
+## API Endpoints
+
+| Method | Endpoint                  | Leírás                              | Paraméterek | Válasz |
+|--------|---------------------------|-------------------------------------|-------------|--------|
+| GET    | /api/products/:categoryId | Termékek lekérése kategória alapján | categoryId (path) – a kategória azonosítója | JSON objektum termékekkel |
+
+### Válasz példa
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "pID": 1,
+      "nev": "Gaming PC",
+      "ar": 450000,
+      "keszlet": 3,
+      "attributes": {
+        /* további termék tulajdonságok */
+      },
+      "images": [
+        {
+          "imageId": 12,
+          "base64": "iVBORw0KGgoAAAANSUhEUgAA..."
+        }
+      ]
+    }
+  ]
+}
