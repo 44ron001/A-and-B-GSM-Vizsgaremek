@@ -9,7 +9,7 @@ function Content() {
 		<div className="slideshow_container">
 			<div className="slideshow">
 				<div className="slides">
-					<img src="/src/images/slide1.jpg" id="slide1" className="slide" draggable="false"/>
+					<img src="/images/slide1.jpg" id="slide1" className="slide" draggable="false"/>
 					<div id="slide_text1" className="slide_text s1">Teljeskörű könyvelés, bevallások</div>
 					
 					<img src="/src/images/slide2.jpg" id="slide2" className="slide" draggable="false"/>

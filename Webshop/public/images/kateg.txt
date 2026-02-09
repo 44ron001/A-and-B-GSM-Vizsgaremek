@@ -1,0 +1,8 @@
+gpu
+cpu
+gépház
+monitor
+alaplap
+tápegység
+memória
+hűtő
