@@ -81,6 +81,7 @@ namespace ABGSM
             {
                 Form5 form5 = new Form5();
                 form5.Show();
+                this.Hide();
             };
         }
 
