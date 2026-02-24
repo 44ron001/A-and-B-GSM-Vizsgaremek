@@ -89,8 +89,6 @@ namespace ABGSM
         }
     }
 
-    // ===== MODEL OSZTÁLYOK =====
-
     public class ApiResponse
     {
         public bool success { get; set; }

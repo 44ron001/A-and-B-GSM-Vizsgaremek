@@ -210,7 +210,7 @@
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(251, 73);
             this.button7.TabIndex = 3;
-            this.button7.Text = "Stock";
+            this.button7.Text = "Ram";
             this.button7.UseVisualStyleBackColor = true;
             this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
@@ -221,7 +221,7 @@
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(251, 73);
             this.button4.TabIndex = 2;
-            this.button4.Text = "Orders";
+            this.button4.Text = "PC Cases";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
@@ -232,7 +232,7 @@
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(251, 73);
             this.button3.TabIndex = 1;
-            this.button3.Text = "Users";
+            this.button3.Text = "GPU";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
@@ -243,7 +243,7 @@
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(251, 73);
             this.button2.TabIndex = 0;
-            this.button2.Text = "Products";
+            this.button2.Text = "CPU";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
