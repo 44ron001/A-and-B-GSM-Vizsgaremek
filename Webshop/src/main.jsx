@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import '/src/styles.css'
 import Landing from '/src/pages/landing.jsx'
 import Products from '/src/pages/products.jsx'
+import ProductDetails from '/src/pages/productDetails.jsx'
 
 createRoot(document.getElementById('root')).render(
 	<StrictMode>
@@ -18,6 +19,7 @@ createRoot(document.getElementById('root')).render(
 				<Route path="/pc-cases" element={<Products categoryId={6} categoryName="PC Cases" fallbackImage="/src/images/pc.png" />} />
 				<Route path="/monitors" element={<Products categoryId={7} categoryName="Monitors" fallbackImage="/src/images/monitor.png" />} />
 				<Route path="/coolers" element={<Products categoryId={8} categoryName="Coolers" fallbackImage="/src/images/cooler.png" />} />
+				<Route path="/product/:productID" element={<ProductDetails/>}  />
 			</Routes>
 		</BrowserRouter>
 	</StrictMode>

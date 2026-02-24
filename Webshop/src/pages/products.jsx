@@ -88,72 +88,50 @@ function Products({ categoryId, categoryName, fallbackImage }) {
 						{products.length === 0 ? (
 							<p>Nincs elérhető termék ebben a kategóriában.</p>
 						) : (
-							products.map(product => (
-								<div key={product.pID} className='product-card'>
-									<div className='product-image-container'>
-										<div className='product-image'>
-											{product.images && product.images.length > 0 ? (
-												<img 
-													src={getImageSrc(product.images[selectedImages[product.pID] || 0].data)} 
-													alt={product.nev} 
-												/>
-											) : (
-												<img src={fallbackImage} alt={product.nev} />
-											)}
-										</div>
-										{product.images && product.images.length > 1 && (
-											<div className='image-thumbnails'>
-												{product.images.map((image, index) => (
-													<div
-														key={image.id}
-														className={`thumbnail ${selectedImages[product.pID] === index ? 'active' : ''}`}
-														onClick={() => handleImageSelect(product.pID, index)}
-													>
-														<img 
-															src={getImageSrc(image.data)} 
-															alt={`${product.nev} - ${index + 1}`} 
-														/>
-													</div>
-												))}
-											</div>
-										)}
-									</div>
-									
-									<div className='product-info'>
-										<h3 className='product-name'>{product.nev}</h3>
-										<p className='product-description'>{product.leiras}</p>
-										
-										{product.attributes && Object.keys(product.attributes).length > 0 && (
-											<div className='product-specs'>
-												{Object.entries(product.attributes).map(([key, value]) => (
-													<div key={key} className='spec-item'>
-														<span className='spec-label'>{key}:</span>
-														<span className='spec-value'>{value}</span>
-													</div>
-												))}
-											</div>
-										)}
-										
-										<div className='product-footer'>
-											<div className='product-stock'>
-												{product.keszlet > 0 ? (
-													<span className='in-stock'>Raktáron: {product.keszlet} db</span>
-												) : (
-													<span className='out-of-stock'>Nincs raktáron</span>
-												)}
-											</div>
-											<div className='product-price'>{formatPrice(product.ar)}</div>
-										</div>
-										
-										<button 
-											className='add-to-cart-btn'
-											disabled={product.keszlet === 0}
-										>
-											{product.keszlet > 0 ? 'Kosárba' : 'Elfogyott'}
-										</button>
-									</div>
-								</div>
-							))
+products.map(product => (
+	<div 
+		key={product.pID} 
+		className='product-card preview'
+		onClick={() => navigate(`/product/${product.pID}`)}
+		style={{ cursor: 'pointer' }}
+	>
+		<div className='product-image'>
+			{product.images && product.images.length > 0 ? (
+				<img 
+					src={getImageSrc(product.images[0].data)} 
+					alt={product.nev} 
+				/>
+			) : (
+				<img src={fallbackImage} alt={product.nev} />
+			)}
+		</div>
+
+		<div className='product-info'>
+			<h3 className='product-name'>{product.nev}</h3>
+
+			<p className='product-description short'>
+				{product.leiras.length > 60
+					? product.leiras.substring(0, 60) + '...'
+					: product.leiras}
+			</p>
+
+			<div className='product-footer'>
+				<div className='product-stock'>
+					{product.keszlet > 0 ? (
+						<span className='in-stock'>Raktáron</span>
+					) : (
+						<span className='out-of-stock'>Nincs raktáron</span>
+					)}
+				</div>
+
+				<div className='product-price'>
+					{formatPrice(product.ar)}
+				</div>
+			</div>
+		</div>
+	</div>
+))
+
 						)}
 					</div>
 					<button className='back-btn' onClick={() => navigate('/')}>

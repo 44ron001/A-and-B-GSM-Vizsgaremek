@@ -80,4 +80,106 @@ const query = `
 	});
 });
 
+
+app.get('/api/product/:productID', (req, res) => {
+	const productID = parseInt(req.params.productID);
+
+	if (isNaN(productID)) {
+		return res.status(400).json({
+			success: false,
+			message: 'Invalid product ID'
+		});
+	}
+
+	const query = `
+		SELECT 
+			p.pID,
+			p.nev,
+			p.ar,
+			p.leiras,
+			p.kID,
+			c.kategoriaNev,
+			s.db as keszlet
+		FROM products p
+		LEFT JOIN categories c ON p.kID = c.kID
+		LEFT JOIN stock s ON p.pID = s.pID
+		WHERE p.pID = ?
+	`;
+
+	db.query(query, [productID], (err, results) => {
+		if (err) {
+			console.error('Query error:', err);
+			return res.status(500).json({
+				success: false,
+				message: 'Database query failed'
+			});
+		}
+
+		if (results.length === 0) {
+			return res.status(404).json({
+				success: false,
+				message: 'Product not found'
+			});
+		}
+
+		const product = results[0];
+
+		// Attribútumok lekérése
+		const attrQuery = `
+			SELECT paramnev, ertek 
+			FROM product_attributes 
+			WHERE pID = ?
+		`;
+
+		db.query(attrQuery, [productID], (err, attrs) => {
+			if (err) {
+				console.error(err);
+				return res.status(500).json({
+					success: false,
+					message: 'Error fetching attributes'
+				});
+			}
+
+			const attributes = {};
+			attrs.forEach(attr => {
+				attributes[attr.paramnev] = attr.ertek;
+			});
+
+			// Képek lekérése
+			const imageQuery = `
+				SELECT imageID, image_data, is_primary, sorrend
+				FROM product_images
+				WHERE pID = ?
+				ORDER BY is_primary DESC, sorrend ASC
+			`;
+
+			db.query(imageQuery, [productID], (err, images) => {
+				if (err) {
+					console.error(err);
+					return res.status(500).json({
+						success: false,
+						message: 'Error fetching images'
+					});
+				}
+
+				res.json({
+					success: true,
+					data: {
+						...product,
+						attributes,
+						images: images.map(img => ({
+							id: img.imageID,
+							data: img.image_data,
+							isPrimary: img.is_primary === 1,
+							order: img.sorrend
+						}))
+					}
+				});
+			});
+		});
+	});
+});
+
+
+
 app.listen(PORT, () => { console.log(`Server running on http://localhost:${PORT}`); });

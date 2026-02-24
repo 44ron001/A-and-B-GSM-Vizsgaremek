@@ -10,10 +10,10 @@ function Content() {
 			<div className="slideshow">
 				<div className="slides">
 					<img src="/images/slide1.jpg" id="slide1" className="slide" draggable="false"/>
-					<div id="slide_text1" className="slide_text s1">Teljeskörű könyvelés, bevallások</div>
+					<div id="slide_text1" className="slide_text s1">Videókártyák jó áron</div>
 					
 					<img src="/src/images/slide2.jpg" id="slide2" className="slide" draggable="false"/>
-					<div id="slide_text2" className="slide_text s2">Munka- és személyügy, Bérszámfejtés</div>
+					<div id="slide_text2" className="slide_text s2">Processzorok jó áron</div>
 					
 					<img src="/src/images/slide3.jpg" id="slide3" className="slide" draggable="false"/>
 					<div id="slide_text3" className="slide_text s3">Szabályzatok kidolgozása</div>
