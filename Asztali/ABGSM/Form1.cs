@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -35,7 +35,6 @@ namespace ABGSM
             label4.Visible = false;
             label5.Visible = true;
             label5.Text = "| username: \n" + "| " + username;
-			// szia bence profi programozo
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
