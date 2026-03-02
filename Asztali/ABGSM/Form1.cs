@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Drawing.Drawing2D;
 
 namespace ABGSM
 {
@@ -17,6 +18,8 @@ namespace ABGSM
         public Form1()
         {
             InitializeComponent();
+            this.DoubleBuffered = true;
+            this.Paint += Form1_Paint;
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -35,9 +38,18 @@ namespace ABGSM
 			// szia bence profi programozo
         }
 
-        private void panel1_Paint(object sender, PaintEventArgs e)
+        private void Form1_Paint(object sender, PaintEventArgs e)
         {
+            Rectangle rect = new Rectangle(0, 0, this.Width, this.Height);
 
+            using (LinearGradientBrush brush = new LinearGradientBrush(
+                rect,
+                Color.FromArgb(135, 81, 81),
+                Color.FromArgb(215, 215, 215),
+                LinearGradientMode.Vertical))
+            {
+                e.Graphics.FillRectangle(brush, rect);
+            }
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
@@ -82,7 +94,6 @@ namespace ABGSM
             {
                 Form5 form5 = new Form5();
                 form5.Show();
-                this.Hide();
             };
         }
 
@@ -102,23 +113,44 @@ namespace ABGSM
             lastSize = this.Size;
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void cPUToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.Size != lastSize)
+            LoggedInCheck();
+            if (isLoggedIn)
             {
-                int deltaWidth = this.Width - lastSize.Width;
-                int deltaHeight = this.Height - lastSize.Height;
-
-                panel2.Width += deltaWidth;
-                panel2.Height += deltaHeight;
-
-                lastSize = this.Size;
-            }
+                Form2 form2 = new Form2();
+                form2.Show();
+            };
         }
 
-        private void panel3_Paint(object sender, PaintEventArgs e)
+        private void gPUToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            LoggedInCheck();
+            if (isLoggedIn)
+            {
+                Form3 form3 = new Form3();
+                form3.Show();
+            };
+        }
 
+        private void pCCasesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoggedInCheck();
+            if (isLoggedIn)
+            {
+                Form4 form4 = new Form4();
+                form4.Show();
+            };
+        }
+
+        private void ramToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoggedInCheck();
+            if (isLoggedIn)
+            {
+                Form5 form5 = new Form5();
+                form5.Show();
+            };
         }
     }
 }

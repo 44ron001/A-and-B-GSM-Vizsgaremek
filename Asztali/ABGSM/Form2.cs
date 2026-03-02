@@ -1,77 +1,116 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using MySql.Data.MySqlClient;
 
 namespace ABGSM
 {
     public partial class Form2 : Form
     {
+        private readonly HttpClient client = new HttpClient();
+
         public Form2()
         {
             InitializeComponent();
+            this.Load += Form2_Load;
         }
 
-        private void Form2_Load(object sender, EventArgs e)
+        private async void Form2_Load(object sender, EventArgs e)
         {
-            using (MySqlConnection conn = new MySqlConnection("server=localhost;uid=root;database=pcshop;port=3307;pwd=;"))
+            await aaa();
+        }
+
+        public async Task aaa()
+        {
+            try
             {
-                conn.Open();
+                this.Text = "Betöltés...";
+                string url = "http://localhost:3001/api/products/1";
 
-                string sql = "SELECT * FROM products";
-                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                HttpResponseMessage response = await client.GetAsync(url);
 
-                using (MySqlDataReader reader = cmd.ExecuteReader())
+                this.Text = response.IsSuccessStatusCode.ToString();
+
+                if (response.IsSuccessStatusCode)
                 {
+                    string json = await response.Content.ReadAsStringAsync();
+
+                    var options = new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    };
+
+                    ApiResponse result = JsonSerializer.Deserialize<ApiResponse>(json, options);
+
                     listBox1.Items.Clear();
 
-                    while (reader.Read())
+                    if (result != null && result.success)
                     {
-                        listBox1.Items.Add(reader["pID"].ToString() + "; " + reader["nev"].ToString());
+                        foreach (var product in result.data)
+                        {
+                            listBox1.Items.Add($"ID: {product.pID}");
+                            listBox1.Items.Add($"Név: {product.nev}");
+                            listBox1.Items.Add($"Ár: {product.ar} Ft");
+                            listBox1.Items.Add($"Leírás: {product.leiras}");
+                            listBox1.Items.Add($"Készlet: {product.keszlet}");
+
+                            listBox1.Items.Add("Attribútumok:");
+                            foreach (var attr in product.attributes)
+                            {
+                                listBox1.Items.Add($"  {attr.Key}: {attr.Value}");
+                            }
+
+                            listBox1.Items.Add("Képek száma: "+ product.images.Count);
+                            listBox1.Items.Add("----------------------------");
+                        }
                     }
                 }
+                else
+                {
+                    listBox1.Items.Add("Error: " + response.StatusCode);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Hiba: " + ex.Message);
             }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (listBox1.SelectedItem == null)
-            {
-                MessageBox.Show("Select an item first!");
-                return;
-            }
 
-            string selected = listBox1.SelectedItem.ToString();
-
-            MessageBox.Show(selected);
-
-
-            int productId = int.Parse(selected.Split(';')[0].Trim());
-
-            using (MySqlConnection conn = new MySqlConnection(
-                "server=localhost;uid=root;database=pcshop;port=3307;pwd=;"))
-            {
-                conn.Open();
-
-                string sql = "DELETE FROM products WHERE pID = @pID";
-                MySqlCommand cmd = new MySqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@pID", productId);
-
-                cmd.ExecuteNonQuery();
-            }
-
-            listBox1.Items.Remove(listBox1.SelectedItem);
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
 
         }
+    }
+
+    public class ApiResponse
+    {
+        public bool success { get; set; }
+        public List<Product> data { get; set; }
+    }
+
+    public class Product
+    {
+        public int pID { get; set; }
+        public string nev { get; set; }
+        public int ar { get; set; }
+        public string leiras { get; set; }
+        public int keszlet { get; set; }
+        public Dictionary<string, string> attributes { get; set; }
+        public List<ProductImage> images { get; set; }
+    }
+
+    public class ProductImage
+    {
+        public int id { get; set; }
+        public string data { get; set; }
+        public bool isPrimary { get; set; }
+        public int order { get; set; }
     }
 }
