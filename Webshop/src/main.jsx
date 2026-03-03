@@ -5,6 +5,7 @@ import '/src/styles.css'
 import Landing from '/src/pages/landing.jsx'
 import Products from '/src/pages/products.jsx'
 import ProductDetails from '/src/pages/productDetails.jsx'
+import SearchResults from '/src/pages/searchResults.jsx'
 
 createRoot(document.getElementById('root')).render(
 	<StrictMode>
@@ -20,6 +21,7 @@ createRoot(document.getElementById('root')).render(
 				<Route path="/monitors" element={<Products categoryId={7} categoryName="Monitors" fallbackImage="/src/images/monitor.png" />} />
 				<Route path="/coolers" element={<Products categoryId={8} categoryName="Coolers" fallbackImage="/src/images/cooler.png" />} />
 				<Route path="/product/:productID" element={<ProductDetails/>}  />
+				<Route path="/search/:name" element={<SearchResults />} />
 			</Routes>
 		</BrowserRouter>
 	</StrictMode>

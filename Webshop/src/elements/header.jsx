@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+
 
 function Header() {
+const navigate = useNavigate();
+const [searchTerm, setSearchTerm] = useState("");
+	
   const [user, setUser] = useState(null);
   const [showAuth, setShowAuth] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -58,12 +64,24 @@ if (res.data.success) {
   };
 
   // Logout handler
-  const logout = () => {
-    closeProfilePopup();
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem("loggedIn");
-  };
+const logout = () => {
+  closeProfilePopup();
+  setUser(null);
+  setToken(null);
+
+  sessionStorage.removeItem("loggedIn");
+  sessionStorage.removeItem("token");
+};
+
+const resetForm = () => {
+  setForm({
+    nev: "",
+    email: "",
+    password: "",
+    telefon: "",
+    lakcim: ""
+  });
+};
 
   // Open profile popup & fetch latest profile from API
   const openProfilePopup = async () => {
@@ -116,14 +134,15 @@ if (res.data.success) {
   };
 
   // Close popups with fade animation
-  const closeAuthPopup = () => {
-    setIsClosingAuth(true);
-    setTimeout(() => {
-      setShowAuth(false);
-      setIsClosingAuth(false);
-      setIsLogin(true);
-    }, 300);
-  };
+const closeAuthPopup = () => {
+  setIsClosingAuth(true);
+  setTimeout(() => {
+    setShowAuth(false);
+    setIsClosingAuth(false);
+    setIsLogin(true);
+    resetForm();   // 👈 add this
+  }, 300);
+};
 
   const closeProfilePopup = () => {
     setIsClosingProfile(true);
@@ -146,9 +165,29 @@ if (res.data.success) {
           <div className='filler'></div>
 
           <div className='searchContainer'>
-            <input type="search" className="search" placeholder="Search..." />
+<input
+  type="search"
+  className="search"
+  placeholder="Search..."
+  value={searchTerm}
+  onChange={(e) => setSearchTerm(e.target.value)}
+  onKeyDown={(e) => {
+    if (e.key === "Enter" && searchTerm.trim().length > 1) {
+      navigate(`/search/${searchTerm}`);
+    }
+  }}
+/>
             <div className='searchHolder'>
-              <img className='searchIcon' src='/src/images/search.png' alt="search" />
+<img
+  className='searchIcon'
+  src='/src/images/search.png'
+  alt="search"
+  onClick={() => {
+    if (searchTerm.trim().length > 1) {
+      navigate(`/search/${searchTerm}`);
+    }
+  }}
+/>
             </div>
           </div>
 
@@ -163,7 +202,7 @@ if (res.data.success) {
               />
             </>
           ) : (
-            <button className='belepes' onClick={() => setShowAuth(true)}>
+            <button className='belepes' onClick={() => { resetForm();setShowAuth(true); }}>
               Log in
             </button>
           )}
@@ -207,7 +246,7 @@ if (res.data.success) {
               </button>
             </div>
 
-            <p className='infoLogin' style={{ cursor: "pointer" }} onClick={() => setIsLogin(!isLogin)}>
+            <p className='infoLogin' style={{ cursor: "pointer" }} onClick={() => { resetForm(); setIsLogin(!isLogin); }}>
               {isLogin ? "No account? Register" : "Already have account? Login"}
             </p>
           </div>
@@ -249,12 +288,13 @@ if (res.data.success) {
 
               <label>
                 Address (Lakcím):
-                <input value={form.lakcim} onChange={e => setForm({ ...form, lakcim: e.target.value })}/>
+                <input className='utso' value={form.lakcim} onChange={e => setForm({ ...form, lakcim: e.target.value })}/>
               </label>
             </div>
 
             <div className="profile_buttons">
               <button onClick={updateProfile}>Save Changes</button>
+			  <div className='filler'></div>
               <button onClick={logout}>Logout</button>
             </div>
           </div>
