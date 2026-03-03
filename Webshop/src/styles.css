@@ -119,6 +119,22 @@ a:hover {
 
 
 
+.cart {
+	width: 23px;
+	height: 23px;
+	margin: 27px;
+	margin-right: 0px;
+	margin-left: 20px;
+	opacity: 0.6;
+	cursor: pointer;
+	transition: opacity 0.2s ease;
+	filter: drop-shadow(0px 0px 2px black);
+}
+
+.cart:hover {
+	opacity: 0.75;
+}
+
 
 h1 {
   font-size: 3.2em;
@@ -186,7 +202,7 @@ button:focus-visible {
 	height: 80px;
 	display: flex;
 	justify-content: center;
-	z-index: 999;
+	z-index: 555;
 }
 
 .headerContent {
@@ -657,16 +673,15 @@ box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
   width: 250px;
   max-width: 320px;
   height: 30px;
-  
   margin: 0;
   font-size: 14px;
   border-radius: 8px;
   border: 1px solid rgba(255,255,255,0.2);
   background-color: rgba(255,255,255,0.1);
-  color: #101828;
+  color: rgba(255,255,255,0.5);
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  
+  border-radius: 10px 0px 0px 10px;
 }
 
 .search::placeholder {
@@ -678,8 +693,41 @@ box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
 }
 
 .search:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  border-color: rgba(255,255,255,0.5);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
+
+
+
+
+.belepes {
+    background: rgba(0, 0, 0, 0.3);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+	font-size: 16px;
+	white-space: nowrap;
+	padding: 10px;
+	color: rgba(255, 255, 255, 0.75);
+	padding-top: 5px;
+	padding-bottom: 5px;
+	margin-left: 20px;
+	
+}
+
+.popup p {
+	color: rgba(255,255,255,0.5);
+}
+
+.popup_content label {
+	color: rgba(255,255,255,0.5);
+}
+
+.belepes:hover {
+	background: rgba(0, 0, 0, 0.6);
 }
 
 
@@ -687,29 +735,182 @@ box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
 
 
 
+.popup_container {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,0.4);
+	z-index: 888;
+	justify-content: center;
+	align-items: center;
+	display: flex;
+	
+	
+	
+}
+
+.infoLogin {
+	width: 100%;
+	text-align: center;
+	opacity: 0.75;
+	color: white;
+}
+
+
+
+.popup {
+	border-radius: 10px;
+	padding: 40px;
+	position: fixed;
+	z-index: 999;
+	background-color: black;
+	background: linear-gradient(90deg, rgba(46, 46, 46, 1) 0%, rgba(90, 90, 90, 1) 100%);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.5);
+	width: 500px;
+}
+
+
+
+
+.popup input {
+	box-sizing: content-box;
+	width: 100%;
+	padding: 10px;
+	border: 2px solid black;
+	width: calc(100% - 24px);
+}
+
+.popup input {
+
+  border: 1px solid rgba(255,255,255,0.2);
+  background-color: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  
+}
+
+.popup input::placeholder {
+  color: #98a2b3;
+}
+
+.popup input :hover {
+  border-color: #b0b7c3;
+}
+
+.popup input :focus {
+  border-color: rgba(255,255,255,0.5);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
+
+.popup button {
+	background-color: rgba(255,255,255,0.1);
+	border: 1px solid rgba(255,255,255,0.2);
+	color: #98a2b3;
+}
+
+
+.loginContainer {
+	display: flex;
+	width: 100%;
+	justify-content: right;
+}
+
+
+
+.popup_header {
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	align-items: center;
+	margin-bottom: 32px;
+}
+
+.closeButton {
+	width: 25px;
+	height: 25px;
+	cursor: pointer;
+	opacity: 0.75;
+}
+
+
+
+.popup h2 {
+	margin: 0;
+	padding: 0;
+	color: rgba(255,255,255,0.75);
+	white-space: nowrap;
+}
+
+
+
+
+.popup_container {
+  animation: fadeIn 0.3s forwards;
+}
+
+.popup {
+	transform: scale(0.95);
+	opacity: 0;
+	animation: scaleUp 0.3s forwards;
+}
+
+@keyframes fadeIn {
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes scaleUp {
+  to { transform: scale(1); opacity: 1; }
+}
 
 
 
 
 
+/* Fade-out animation */
+.fade-out {
+  animation: fadeOut 0.3s forwards;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    
+  }
+}
 
 
+.searchHolder {
+	cursor: pointer;
+	width: 30px;
+	height: 30px;
+	max-height: 30px;
+	background: rgba(0, 0, 0, 0.3);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 0px 10px 10px 0px;
+	
+	padding: 0;
+	margin: 0;
+	
+}
 
+.searchContainer {
+	display: flex;
+	flex-direction: row;
+	height: 30px;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.searchIcon {
+	width: 15px;
+	height: 15px;
+	margin: 0;
+	padding: 0;
+	opacity: 0.75;
+}
 
 
 .page-title {

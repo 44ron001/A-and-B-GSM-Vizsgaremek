@@ -183,3 +183,10 @@ INSERT INTO product_images (pID, image_data, is_primary, sorrend) VALUES
 
 (5, 'BASE64_STRING_HERE', 1, 0),  
 (5, 'BASE64_STRING_HERE', 0, 1);  -- ide még jönnek példa képek
+
+
+ALTER TABLE products 
+ADD FULLTEXT(nev, leiras);
+
+ALTER TABLE product_attributes
+ADD FULLTEXT(paramnev, ertek);

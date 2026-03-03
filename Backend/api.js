@@ -435,17 +435,49 @@ app.get('/api/profile', authenticateToken, (req, res) => {
 	);
 });
 
-app.put('/api/profile', authenticateToken, (req, res) => {
-	const { nev, lakcim, telefon } = req.body;
+app.put('/api/profile', authenticateToken, async (req, res) => {
+	try {
+		const { nev, email, password, telefon, lakcim } = req.body;
 
-	db.query(
-		'UPDATE users SET nev=?, lakcim=?, telefon=? WHERE userID=?',
-		[nev, lakcim, telefon, req.user.userID],
-		(err) => {
-			if (err) return res.status(500).json({ success: false });
-			res.json({ success: true });
+		// Prepare fields to update
+		const updates = [];
+		const values = [];
+
+		if (nev) { updates.push('nev=?'); values.push(nev); }
+		if (email) { updates.push('email=?'); values.push(email); }
+		if (telefon) { updates.push('telefon=?'); values.push(telefon); }
+		if (lakcim) { updates.push('lakcim=?'); values.push(lakcim); }
+
+		if (password) {
+			const hashed = await bcrypt.hash(password, 10);
+			updates.push('password=?');
+			values.push(hashed);
 		}
-	);
+
+		if (updates.length === 0) {
+			return res.status(400).json({ success: false, message: "No fields to update" });
+		}
+
+		values.push(req.user.userID); // for WHERE userID=?
+
+		const sql = `UPDATE users SET ${updates.join(', ')} WHERE userID=?`;
+
+		db.query(sql, values, (err) => {
+			if (err) return res.status(500).json({ success: false, message: err.message });
+
+			// Return updated user
+			db.query(
+				'SELECT userID, nev, email, telefon, lakcim FROM users WHERE userID=?',
+				[req.user.userID],
+				(err2, results) => {
+					if (err2 || results.length === 0) return res.status(500).json({ success: false });
+					res.json({ success: true, user: results[0] });
+				}
+			);
+		});
+	} catch (err) {
+		res.status(500).json({ success: false, message: err.message });
+	}
 });
 
 app.listen(PORT, () => { console.log(`Server running on http://localhost:${PORT}`); });
