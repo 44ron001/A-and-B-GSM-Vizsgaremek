@@ -480,4 +480,175 @@ app.put('/api/profile', authenticateToken, async (req, res) => {
 	}
 });
 
+app.put('/api/product/:productID', (req, res) => {
+	const productID = parseInt(req.params.productID);
+	if (isNaN(productID)) {
+	  return res.status(400).json({ success: false, message: 'Invalid product ID' });
+	}
+  
+	const { nev, ar, leiras, keszlet, attributes } = req.body;
+  
+	if (typeof nev !== 'string' || nev.trim().length < 1) {
+	  return res.status(400).json({ success: false, message: 'Invalid nev' });
+	}
+	if (!Number.isInteger(ar) || ar < 0) {
+	  return res.status(400).json({ success: false, message: 'Invalid ar' });
+	}
+	if (typeof leiras !== 'string') {
+	  return res.status(400).json({ success: false, message: 'Invalid leiras' });
+	}
+	if (!Number.isInteger(keszlet) || keszlet < 0) {
+	  return res.status(400).json({ success: false, message: 'Invalid keszlet' });
+	}
+  
+	const attrObj = (attributes && typeof attributes === 'object') ? attributes : {};
+  
+	db.beginTransaction((err) => {
+	  if (err) {
+		console.error(err);
+		return res.status(500).json({ success: false, message: 'Transaction start failed' });
+	  }
+  
+	  // 1) products update
+	  db.query(
+		'UPDATE products SET nev=?, ar=?, leiras=? WHERE pID=?',
+		[nev.trim(), ar, leiras, productID],
+		(err, result) => {
+		  if (err) return db.rollback(() => {
+			console.error(err);
+			res.status(500).json({ success: false, message: 'Update products failed' });
+		  });
+  
+		  if (result.affectedRows === 0) return db.rollback(() => {
+			res.status(404).json({ success: false, message: 'Product not found' });
+		  });
+  
+		  // 2) stock upsert (stock: pID, db)
+		  db.query(
+			'INSERT INTO stock (pID, db) VALUES (?, ?) ON DUPLICATE KEY UPDATE db=VALUES(db)',
+			[productID, keszlet],
+			(err) => {
+			  if (err) return db.rollback(() => {
+				console.error(err);
+				res.status(500).json({ success: false, message: 'Update stock failed' });
+			  });
+  
+			  // 3) attributes: delete + insert
+			  db.query(
+				'DELETE FROM product_attributes WHERE pID=?',
+				[productID],
+				(err) => {
+				  if (err) return db.rollback(() => {
+					console.error(err);
+					res.status(500).json({ success: false, message: 'Delete attributes failed' });
+				  });
+  
+				  const keys = Object.keys(attrObj);
+				  if (keys.length === 0) {
+					return db.commit((err) => {
+					  if (err) return db.rollback(() => {
+						console.error(err);
+						res.status(500).json({ success: false, message: 'Commit failed' });
+					  });
+					  res.json({ success: true });
+					});
+				  }
+  
+				  const values = keys.map(k => [productID, k, String(attrObj[k])]);
+  
+				  db.query(
+					'INSERT INTO product_attributes (pID, paramnev, ertek) VALUES ?',
+					[values],
+					(err) => {
+					  if (err) return db.rollback(() => {
+						console.error(err);
+						res.status(500).json({ success: false, message: 'Insert attributes failed' });
+					  });
+  
+					  db.commit((err) => {
+						if (err) return db.rollback(() => {
+						  console.error(err);
+						  res.status(500).json({ success: false, message: 'Commit failed' });
+						});
+						res.json({ success: true });
+					  });
+					}
+				  );
+				}
+			  );
+			}
+		  );
+		}
+	  );
+	});
+  });
+
+  app.post('/api/product/:productID/image', (req, res) => {
+	const productID = parseInt(req.params.productID);
+	if (isNaN(productID)) {
+	  return res.status(400).json({ success: false, message: 'Invalid product ID' });
+	}
+  
+	let { data, isPrimary, order } = req.body;
+  
+	if (typeof data !== 'string' || data.length < 10) {
+	  return res.status(400).json({ success: false, message: 'Missing image base64 data' });
+	}
+  
+	// ha "data:image/png;base64,..." formában jönne, levágjuk az elejét
+	const commaIndex = data.indexOf(',');
+	if (commaIndex !== -1) data = data.substring(commaIndex + 1);
+  
+	isPrimary = isPrimary ? 1 : 0;
+	order = Number.isInteger(order) ? order : 0;
+  
+	db.beginTransaction((err) => {
+	  if (err) {
+		console.error(err);
+		return res.status(500).json({ success: false, message: 'Transaction start failed' });
+	  }
+  
+	  const setPrimaryIfNeeded = (cb) => {
+		if (!isPrimary) return cb();
+  
+		// ha ez primary, akkor a többit levesszük primary-ról
+		db.query(
+		  'UPDATE product_images SET is_primary = 0 WHERE pID = ?',
+		  [productID],
+		  (err) => {
+			if (err) return cb(err);
+			cb();
+		  }
+		);
+	  };
+  
+	  setPrimaryIfNeeded((err) => {
+		if (err) return db.rollback(() => {
+		  console.error(err);
+		  res.status(500).json({ success: false, message: 'Primary reset failed' });
+		});
+  
+		db.query(
+		  'INSERT INTO product_images (pID, image_data, is_primary, sorrend) VALUES (?, ?, ?, ?)',
+		  [productID, data, isPrimary, order],
+		  (err, result) => {
+			if (err) return db.rollback(() => {
+			  console.error(err);
+			  res.status(500).json({ success: false, message: 'Insert image failed' });
+			});
+  
+			db.commit((err) => {
+			  if (err) return db.rollback(() => {
+				console.error(err);
+				res.status(500).json({ success: false, message: 'Commit failed' });
+			  });
+  
+			  res.json({ success: true, imageID: result.insertId });
+			});
+		  }
+		);
+	  });
+	});
+  });
+
 app.listen(PORT, () => { console.log(`Server running on http://localhost:${PORT}`); });

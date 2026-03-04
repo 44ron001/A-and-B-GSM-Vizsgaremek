@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -14,15 +15,28 @@ namespace ABGSM
         public Form2()
         {
             InitializeComponent();
+
+            listView1.View = View.Details;
+            listView1.FullRowSelect = true;
+            listView1.GridLines = true;
+            listView1.MultiSelect = false;
+
+            listView1.Columns.Add("ID", 50);
+            listView1.Columns.Add("Név", 180);
+            listView1.Columns.Add("Ár (Ft)", 100);
+            listView1.Columns.Add("Készlet", 80);
+
+            listView1.DoubleClick += listView1_DoubleClick;
+
             this.Load += Form2_Load;
         }
 
         private async void Form2_Load(object sender, EventArgs e)
         {
-            await aaa();
+            await LoadProducts();
         }
 
-        public async Task aaa()
+        private async Task LoadProducts()
         {
             try
             {
@@ -30,47 +44,33 @@ namespace ABGSM
                 string url = "http://localhost:3001/api/products/1";
 
                 HttpResponseMessage response = await client.GetAsync(url);
-
-                this.Text = response.IsSuccessStatusCode.ToString();
-
-                if (response.IsSuccessStatusCode)
+                if (!response.IsSuccessStatusCode)
                 {
-                    string json = await response.Content.ReadAsStringAsync();
+                    MessageBox.Show("Hiba: " + response.StatusCode);
+                    return;
+                }
 
-                    var options = new JsonSerializerOptions
+                string json = await response.Content.ReadAsStringAsync();
+
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                ApiResponse result = JsonSerializer.Deserialize<ApiResponse>(json, options);
+
+                listView1.Items.Clear();
+
+                if (result != null && result.success && result.data != null)
+                {
+                    foreach (var product in result.data)
                     {
-                        PropertyNameCaseInsensitive = true
-                    };
-
-                    ApiResponse result = JsonSerializer.Deserialize<ApiResponse>(json, options);
-
-                    listBox1.Items.Clear();
-
-                    if (result != null && result.success)
-                    {
-                        foreach (var product in result.data)
-                        {
-                            listBox1.Items.Add($"ID: {product.pID}");
-                            listBox1.Items.Add($"Név: {product.nev}");
-                            listBox1.Items.Add($"Ár: {product.ar} Ft");
-                            listBox1.Items.Add($"Leírás: {product.leiras}");
-                            listBox1.Items.Add($"Készlet: {product.keszlet}");
-
-                            listBox1.Items.Add("Attribútumok:");
-                            foreach (var attr in product.attributes)
-                            {
-                                listBox1.Items.Add($"  {attr.Key}: {attr.Value}");
-                            }
-
-                            listBox1.Items.Add("Képek száma: "+ product.images.Count);
-                            listBox1.Items.Add("----------------------------");
-                        }
+                        var item = new ListViewItem(product.pID.ToString());
+                        item.SubItems.Add(product.nev);
+                        item.SubItems.Add(product.ar.ToString());
+                        item.SubItems.Add(product.keszlet.ToString());
+                        item.Tag = product;
+                        listView1.Items.Add(item);
                     }
                 }
-                else
-                {
-                    listBox1.Items.Add("Error: " + response.StatusCode);
-                }
+
+                this.Text = "Kész";
             }
             catch (Exception ex)
             {
@@ -78,14 +78,21 @@ namespace ABGSM
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private async void listView1_DoubleClick(object sender, EventArgs e)
         {
+            if (listView1.SelectedItems.Count == 0) return;
 
-        }
+            var selected = listView1.SelectedItems[0];
+            var product = (Product)selected.Tag;
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-
+            using (var edit = new EditProductForm(client, product))
+            {
+                var dr = edit.ShowDialog();
+                if (dr == DialogResult.OK)
+                {
+                    await LoadProducts();
+                }
+            }
         }
     }
 
