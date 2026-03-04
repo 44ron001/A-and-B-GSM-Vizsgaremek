@@ -651,4 +651,127 @@ app.put('/api/product/:productID', (req, res) => {
 	});
   });
 
+// KÉP TÖRLÉSE
+app.delete('/api/product/:productID/image/:imageID', (req, res) => {
+	const productID = parseInt(req.params.productID);
+	const imageID = parseInt(req.params.imageID);
+  
+	if (isNaN(productID) || isNaN(imageID)) {
+	  return res.status(400).json({ success: false, message: 'Invalid IDs' });
+	}
+  
+	db.beginTransaction((err) => {
+	  if (err) return res.status(500).json({ success: false, message: 'Transaction start failed' });
+  
+	  db.query(
+		'SELECT is_primary FROM product_images WHERE pID=? AND imageID=?',
+		[productID, imageID],
+		(err, rows) => {
+		  if (err) return db.rollback(() => res.status(500).json({ success: false, message: 'Select failed' }));
+		  if (!rows || rows.length === 0) return db.rollback(() => res.status(404).json({ success: false, message: 'Image not found' }));
+  
+		  const wasPrimary = rows[0].is_primary === 1;
+  
+		  db.query(
+			'DELETE FROM product_images WHERE pID=? AND imageID=?',
+			[productID, imageID],
+			(err, result) => {
+			  if (err) return db.rollback(() => res.status(500).json({ success: false, message: 'Delete failed' }));
+			  if (result.affectedRows === 0) return db.rollback(() => res.status(404).json({ success: false, message: 'Image not found' }));
+  
+			  const ensurePrimary = (cb) => {
+				if (!wasPrimary) return cb();
+  
+				db.query(
+				  `UPDATE product_images
+				   SET is_primary = CASE WHEN imageID = (
+					  SELECT t.imageID FROM (
+						SELECT imageID FROM product_images
+						WHERE pID = ?
+						ORDER BY sorrend ASC, imageID ASC
+						LIMIT 1
+					  ) t
+				   ) THEN 1 ELSE 0 END
+				   WHERE pID = ?`,
+				  [productID, productID],
+				  (err) => cb(err)
+				);
+			  };
+  
+			  ensurePrimary((err) => {
+				if (err) return db.rollback(() => res.status(500).json({ success: false, message: 'Primary fix failed' }));
+  
+				db.commit((err) => {
+				  if (err) return db.rollback(() => res.status(500).json({ success: false, message: 'Commit failed' }));
+				  res.json({ success: true });
+				});
+			  });
+			}
+		  );
+		}
+	  );
+	});
+  });
+  
+  // KÉP MÓDOSÍTÁSA (primary + sorrend)
+  app.put('/api/product/:productID/image/:imageID', (req, res) => {
+	const productID = parseInt(req.params.productID);
+	const imageID = parseInt(req.params.imageID);
+  
+	if (isNaN(productID) || isNaN(imageID)) {
+	  return res.status(400).json({ success: false, message: 'Invalid IDs' });
+	}
+  
+	let { isPrimary, order } = req.body;
+  
+	const hasIsPrimary = typeof isPrimary !== 'undefined';
+	const hasOrder = typeof order !== 'undefined';
+  
+	if (!hasIsPrimary && !hasOrder) {
+	  return res.status(400).json({ success: false, message: 'Nothing to update' });
+	}
+  
+	isPrimary = isPrimary ? 1 : 0;
+	order = Number.isInteger(order) ? order : 0;
+  
+	db.beginTransaction((err) => {
+	  if (err) return res.status(500).json({ success: false, message: 'Transaction start failed' });
+  
+	  const resetPrimaryIfNeeded = (cb) => {
+		if (!hasIsPrimary || !isPrimary) return cb();
+		db.query(
+		  'UPDATE product_images SET is_primary = 0 WHERE pID = ?',
+		  [productID],
+		  (err) => cb(err)
+		);
+	  };
+  
+	  resetPrimaryIfNeeded((err) => {
+		if (err) return db.rollback(() => res.status(500).json({ success: false, message: 'Primary reset failed' }));
+  
+		const sets = [];
+		const values = [];
+  
+		if (hasIsPrimary) { sets.push('is_primary=?'); values.push(isPrimary); }
+		if (hasOrder) { sets.push('sorrend=?'); values.push(order); }
+  
+		values.push(productID, imageID);
+  
+		db.query(
+		  `UPDATE product_images SET ${sets.join(', ')} WHERE pID=? AND imageID=?`,
+		  values,
+		  (err, result) => {
+			if (err) return db.rollback(() => res.status(500).json({ success: false, message: 'Update failed' }));
+			if (result.affectedRows === 0) return db.rollback(() => res.status(404).json({ success: false, message: 'Image not found' }));
+  
+			db.commit((err) => {
+			  if (err) return db.rollback(() => res.status(500).json({ success: false, message: 'Commit failed' }));
+			  res.json({ success: true });
+			});
+		  }
+		);
+	  });
+	});
+  });
+
 app.listen(PORT, () => { console.log(`Server running on http://localhost:${PORT}`); });
