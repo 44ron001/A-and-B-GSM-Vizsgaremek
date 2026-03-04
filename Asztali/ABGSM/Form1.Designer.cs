@@ -38,7 +38,7 @@
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loginToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -144,7 +144,7 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exitToolStripMenuItem,
+            this.loginToolStripMenuItem,
             this.menuToolStripMenuItem,
             this.exitToolStripMenuItem1});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
@@ -153,11 +153,11 @@
             this.menuStrip1.TabIndex = 3;
             this.menuStrip1.Text = "menuStrip1";
             // 
-            // exitToolStripMenuItem
+            // loginToolStripMenuItem
             // 
-            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(49, 20);
-            this.exitToolStripMenuItem.Text = "Login";
+            this.loginToolStripMenuItem.Name = "loginToolStripMenuItem";
+            this.loginToolStripMenuItem.Size = new System.Drawing.Size(49, 20);
+            this.loginToolStripMenuItem.Text = "Login";
             // 
             // menuToolStripMenuItem
             // 
@@ -173,28 +173,28 @@
             // cPUToolStripMenuItem
             // 
             this.cPUToolStripMenuItem.Name = "cPUToolStripMenuItem";
-            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.cPUToolStripMenuItem.Text = "CPU";
             this.cPUToolStripMenuItem.Click += new System.EventHandler(this.cPUToolStripMenuItem_Click);
             // 
             // gPUToolStripMenuItem
             // 
             this.gPUToolStripMenuItem.Name = "gPUToolStripMenuItem";
-            this.gPUToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this.gPUToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.gPUToolStripMenuItem.Text = "GPU";
             this.gPUToolStripMenuItem.Click += new System.EventHandler(this.gPUToolStripMenuItem_Click);
             // 
             // pCCasesToolStripMenuItem
             // 
             this.pCCasesToolStripMenuItem.Name = "pCCasesToolStripMenuItem";
-            this.pCCasesToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
-            this.pCCasesToolStripMenuItem.Text = "PC Cases";
+            this.pCCasesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.pCCasesToolStripMenuItem.Text = "PSU";
             this.pCCasesToolStripMenuItem.Click += new System.EventHandler(this.pCCasesToolStripMenuItem_Click);
             // 
             // ramToolStripMenuItem
             // 
             this.ramToolStripMenuItem.Name = "ramToolStripMenuItem";
-            this.ramToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this.ramToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.ramToolStripMenuItem.Text = "Ram";
             this.ramToolStripMenuItem.Click += new System.EventHandler(this.ramToolStripMenuItem_Click);
             // 
@@ -235,7 +235,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loginToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem menuToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cPUToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem gPUToolStripMenuItem;

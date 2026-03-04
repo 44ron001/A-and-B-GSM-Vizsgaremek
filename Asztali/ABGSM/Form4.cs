@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using MySql.Data.MySqlClient;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace ABGSM
 {
@@ -17,81 +11,89 @@ namespace ABGSM
     {
         private readonly HttpClient client = new HttpClient();
 
+        // TODO: ide írd be a PSU kategória ID-ját a categories táblából
+        private const int PSU_CATEGORY_ID = 3;
+
         public Form4()
         {
             InitializeComponent();
+
+            listView1.View = View.Details;
+            listView1.FullRowSelect = true;
+            listView1.GridLines = true;
+            listView1.MultiSelect = false;
+
+            listView1.Columns.Clear();
+            listView1.Columns.Add("ID", 50);
+            listView1.Columns.Add("Név", 220);
+            listView1.Columns.Add("Ár (Ft)", 100);
+            listView1.Columns.Add("Készlet", 80);
+
+            listView1.DoubleClick += listView1_DoubleClick;
+            this.Load += Form4_Load;
         }
 
-        private async Task Form4_Load(object sender, EventArgs e)
+        private async void Form4_Load(object sender, EventArgs e)
         {
-            this.Text = "Betöltés...";
-            await aaa();
-            this.Text = "Kész";
+            await LoadProducts();
         }
 
-        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        public async Task aaa()
+        private async Task LoadProducts()
         {
             try
             {
                 this.Text = "Betöltés...";
-                string url = "http://localhost:3001/api/products/3";
+                string url = "http://localhost:3001/api/products/5";
 
                 HttpResponseMessage response = await client.GetAsync(url);
-
-                this.Text = response.IsSuccessStatusCode.ToString();
-
-                if (response.IsSuccessStatusCode)
+                if (!response.IsSuccessStatusCode)
                 {
-                    string json = await response.Content.ReadAsStringAsync();
+                    MessageBox.Show("Hiba: " + response.StatusCode);
+                    return;
+                }
 
-                    var options = new JsonSerializerOptions
+                string json = await response.Content.ReadAsStringAsync();
+
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                ApiResponse result = JsonSerializer.Deserialize<ApiResponse>(json, options);
+
+                listView1.Items.Clear();
+
+                if (result != null && result.success && result.data != null)
+                {
+                    foreach (var product in result.data)
                     {
-                        PropertyNameCaseInsensitive = true
-                    };
+                        var item = new ListViewItem(product.pID.ToString());
+                        item.SubItems.Add(product.nev ?? "");
+                        item.SubItems.Add(product.ar.ToString());
+                        item.SubItems.Add(product.keszlet.ToString());
+                        item.Tag = product;
 
-                    ApiResponse result = JsonSerializer.Deserialize<ApiResponse>(json, options);
-
-                    listBox1.Items.Clear();
-
-                    if (result != null && result.success)
-                    {
-                        foreach (var product in result.data)
-                        {
-                            listBox1.Items.Add($"ID: {product.pID}");
-                            listBox1.Items.Add($"Név: {product.nev}");
-                            listBox1.Items.Add($"Ár: {product.ar} Ft");
-                            listBox1.Items.Add($"Leírás: {product.leiras}");
-                            listBox1.Items.Add($"Készlet: {product.keszlet}");
-
-                            listBox1.Items.Add("Attribútumok:");
-                            foreach (var attr in product.attributes)
-                            {
-                                listBox1.Items.Add($"  {attr.Key}: {attr.Value}");
-                            }
-
-                            listBox1.Items.Add("Képek száma: " + product.images.Count);
-                            listBox1.Items.Add("----------------------------");
-                        }
+                        listView1.Items.Add(item);
                     }
                 }
-                else
-                {
-                    listBox1.Items.Add("Error: " + response.StatusCode);
-                }
+
+                this.Text = "Power Supply Unit";
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Hiba: " + ex.Message);
+            }
+        }
+
+        private async void listView1_DoubleClick(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count == 0) return;
+
+            var product = (Product)listView1.SelectedItems[0].Tag;
+
+            using (var edit = new EditProductForm(client, product))
+            {
+                var dr = edit.ShowDialog();
+                if (dr == DialogResult.OK)
+                {
+                    await LoadProducts();
+                }
             }
         }
     }

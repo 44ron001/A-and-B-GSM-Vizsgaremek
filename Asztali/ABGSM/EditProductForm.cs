@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -21,13 +24,22 @@ namespace ABGSM
         private Button btnSave;
         private Button btnCancel;
 
+        // Feltöltés
         private PictureBox picPreview;
         private Button btnChooseImage;
         private Button btnUploadImage;
+
         private CheckBox chkPrimary;
         private NumericUpDown numOrder;
 
         private string _selectedImageBase64;
+
+        // Képlista + kezelés
+        private ListView lvImages;
+        private Button btnDeleteImage;
+        private Button btnApplyImage;
+        private Button btnUp;
+        private Button btnDown;
 
         public EditProductForm(HttpClient client, Product product)
         {
@@ -36,6 +48,7 @@ namespace ABGSM
 
             BuildUi();
             LoadDataToControls();
+            _ = RefreshImagesFromServer(); // betöltés
         }
 
         private void BuildUi()
@@ -46,7 +59,7 @@ namespace ABGSM
             MaximizeBox = false;
             MinimizeBox = false;
             ShowInTaskbar = false;
-            ClientSize = new System.Drawing.Size(760, 650);
+            ClientSize = new System.Drawing.Size(820, 690);
 
             var padding = 12;
             int labelW = 110;
@@ -102,11 +115,11 @@ namespace ABGSM
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect
             };
-
             gridAttr.Columns.Add(new DataGridViewTextBoxColumn { Name = "KeyCol", HeaderText = "Kulcs" });
             gridAttr.Columns.Add(new DataGridViewTextBoxColumn { Name = "ValCol", HeaderText = "Érték" });
 
-            var lblImg = new Label { Text = "Kép:", Left = padding, Top = gridAttr.Bottom + 12, Width = labelW };
+            // --- KÉP FELTÖLTÉS + LISTA
+            var lblImg = new Label { Text = "Képek:", Left = padding, Top = gridAttr.Bottom + 12, Width = labelW };
 
             btnChooseImage = new Button
             {
@@ -152,16 +165,40 @@ namespace ABGSM
                 Maximum = 1000
             };
 
+            // előnézet
             picPreview = new PictureBox
             {
                 Left = padding + labelW + 10,
                 Top = btnChooseImage.Bottom + 8,
-                Width = 220,
-                Height = 90,
+                Width = 250,
+                Height = 120,
                 BorderStyle = BorderStyle.FixedSingle,
                 SizeMode = PictureBoxSizeMode.Zoom
             };
 
+            // képlista
+            lvImages = new ListView
+            {
+                Left = picPreview.Right + 12,
+                Top = picPreview.Top,
+                Width = ClientSize.Width - padding - (picPreview.Right + 12),
+                Height = picPreview.Height,
+                View = View.Details,
+                FullRowSelect = true,
+                GridLines = true,
+                MultiSelect = false
+            };
+            lvImages.Columns.Add("ImageID", 70);
+            lvImages.Columns.Add("Primary", 70);
+            lvImages.Columns.Add("Sorrend", 70);
+
+            btnUp = new Button { Text = "Fel", Left = lvImages.Left, Top = lvImages.Bottom + 6, Width = 60, Height = 28 };
+            btnDown = new Button { Text = "Le", Left = btnUp.Right + 6, Top = btnUp.Top, Width = 60, Height = 28 };
+
+            btnApplyImage = new Button { Text = "Kijelölt mentése", Left = btnDown.Right + 10, Top = btnUp.Top, Width = 140, Height = 28 };
+            btnDeleteImage = new Button { Text = "Törlés", Left = btnApplyImage.Right + 10, Top = btnUp.Top, Width = 90, Height = 28 };
+
+            // mentés/mégse
             btnSave = new Button { Text = "Mentés", Width = 110, Height = 32 };
             btnCancel = new Button { Text = "Mégse", Width = 110, Height = 32 };
 
@@ -172,10 +209,17 @@ namespace ABGSM
             btnSave.Left = btnCancel.Left - 10 - btnSave.Width;
             btnSave.Top = btnTop;
 
+            // events
             btnChooseImage.Click += BtnChooseImage_Click;
             btnUploadImage.Click += async (s, e) => await UploadImageAsync();
             btnSave.Click += async (s, e) => await SaveAsync();
             btnCancel.Click += (s, e) => { DialogResult = DialogResult.Cancel; Close(); };
+
+            lvImages.SelectedIndexChanged += LvImages_SelectedIndexChanged;
+            btnDeleteImage.Click += async (s, e) => await DeleteSelectedImageAsync();
+            btnApplyImage.Click += async (s, e) => await UpdateSelectedImageAsync();
+            btnUp.Click += async (s, e) => await MoveSelectedAsync(-1);
+            btnDown.Click += async (s, e) => await MoveSelectedAsync(+1);
 
             AcceptButton = btnSave;
             CancelButton = btnCancel;
@@ -190,6 +234,7 @@ namespace ABGSM
             Controls.Add(txtLeiras);
             Controls.Add(lblAttr);
             Controls.Add(gridAttr);
+
             Controls.Add(lblImg);
             Controls.Add(btnChooseImage);
             Controls.Add(btnUploadImage);
@@ -197,6 +242,12 @@ namespace ABGSM
             Controls.Add(lblOrder);
             Controls.Add(numOrder);
             Controls.Add(picPreview);
+            Controls.Add(lvImages);
+            Controls.Add(btnUp);
+            Controls.Add(btnDown);
+            Controls.Add(btnApplyImage);
+            Controls.Add(btnDeleteImage);
+
             Controls.Add(btnSave);
             Controls.Add(btnCancel);
         }
@@ -281,6 +332,8 @@ namespace ABGSM
             }
         }
 
+        // ---------------- IMAGES ----------------
+
         private void BtnChooseImage_Click(object sender, EventArgs e)
         {
             using (var ofd = new OpenFileDialog())
@@ -289,7 +342,8 @@ namespace ABGSM
                 if (ofd.ShowDialog() != DialogResult.OK) return;
 
                 picPreview.ImageLocation = ofd.FileName;
-                byte[] bytes = System.IO.File.ReadAllBytes(ofd.FileName);
+
+                byte[] bytes = File.ReadAllBytes(ofd.FileName);
                 _selectedImageBase64 = Convert.ToBase64String(bytes);
                 btnUploadImage.Enabled = true;
             }
@@ -299,16 +353,20 @@ namespace ABGSM
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(_selectedImageBase64)) return;
+                if (string.IsNullOrWhiteSpace(_selectedImageBase64))
+                {
+                    MessageBox.Show("Nincs kiválasztott kép!");
+                    return;
+                }
 
                 btnUploadImage.Enabled = false;
                 btnChooseImage.Enabled = false;
 
                 var payload = new UploadImageRequest
                 {
-                    data = _selectedImageBase64,
-                    isPrimary = chkPrimary.Checked,
-                    order = (int)numOrder.Value
+                    Data = _selectedImageBase64,
+                    IsPrimary = chkPrimary.Checked,
+                    Order = (int)numOrder.Value
                 };
 
                 string url = $"http://localhost:3001/api/product/{_product.pID}/image";
@@ -316,8 +374,11 @@ namespace ABGSM
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
                 var resp = await _client.PostAsync(url, content);
 
+                string body = await resp.Content.ReadAsStringAsync();
+
                 if (!resp.IsSuccessStatusCode)
                 {
+                    MessageBox.Show($"Hiba: {(int)resp.StatusCode} {resp.ReasonPhrase}\n\n{body}");
                     btnUploadImage.Enabled = true;
                     btnChooseImage.Enabled = true;
                     return;
@@ -326,20 +387,216 @@ namespace ABGSM
                 _selectedImageBase64 = null;
                 btnChooseImage.Enabled = true;
                 btnUploadImage.Enabled = false;
-                MessageBox.Show("Kép feltöltve");
+
+                await RefreshImagesFromServer();
+                MessageBox.Show("Kép feltöltve!");
             }
-            catch
+            catch (Exception ex)
             {
+                MessageBox.Show("Kliens hiba: " + ex.Message);
                 btnChooseImage.Enabled = true;
                 btnUploadImage.Enabled = true;
             }
         }
 
+        private async Task RefreshImagesFromServer()
+        {
+            try
+            {
+                string url = $"http://localhost:3001/api/product/{_product.pID}";
+                var resp = await _client.GetAsync(url);
+                if (!resp.IsSuccessStatusCode) return;
+
+                var json = await resp.Content.ReadAsStringAsync();
+                var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var result = JsonSerializer.Deserialize<SingleProductResponse>(json, opts);
+
+                if (result?.success == true && result.data != null)
+                {
+                    _product.images = result.data.images ?? new List<ProductImage>();
+                    LoadImagesToList();
+                }
+            }
+            catch { /* elég, ha nem crashel */ }
+        }
+
+        private void LoadImagesToList()
+        {
+            lvImages.Items.Clear();
+
+            if (_product.images == null) _product.images = new List<ProductImage>();
+
+            foreach (var img in _product.images)
+            {
+                var it = new ListViewItem(img.id.ToString());
+                it.SubItems.Add(img.isPrimary ? "Igen" : "Nem");
+                it.SubItems.Add(img.order.ToString());
+                it.Tag = img;
+                lvImages.Items.Add(it);
+            }
+        }
+
+        private void LvImages_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lvImages.SelectedItems.Count == 0) return;
+
+            var img = (ProductImage)lvImages.SelectedItems[0].Tag;
+
+            // állítsuk be a szerkesztő mezőket is
+            chkPrimary.Checked = img.isPrimary;
+            numOrder.Value = img.order;
+
+            // preview base64-ből
+            try
+            {
+                picPreview.Image = Base64ToImage(img.data);
+            }
+            catch
+            {
+                // ha valamiért nem jó a base64, ne haljon meg
+                picPreview.Image = null;
+            }
+        }
+
+        private async Task DeleteSelectedImageAsync()
+        {
+            if (lvImages.SelectedItems.Count == 0)
+            {
+                MessageBox.Show("Válassz ki egy képet a listából!");
+                return;
+            }
+
+            var img = (ProductImage)lvImages.SelectedItems[0].Tag;
+
+            var dr = MessageBox.Show($"Biztos törlöd? (ImageID: {img.id})", "Törlés", MessageBoxButtons.YesNo);
+            if (dr != DialogResult.Yes) return;
+
+            string url = $"http://localhost:3001/api/product/{_product.pID}/image/{img.id}";
+            var resp = await _client.DeleteAsync(url);
+            var body = await resp.Content.ReadAsStringAsync();
+
+            if (!resp.IsSuccessStatusCode)
+            {
+                MessageBox.Show($"Hiba: {(int)resp.StatusCode}\n{body}");
+                return;
+            }
+
+            await RefreshImagesFromServer();
+        }
+
+        private async Task UpdateSelectedImageAsync()
+        {
+            if (lvImages.SelectedItems.Count == 0)
+            {
+                MessageBox.Show("Válassz ki egy képet a listából!");
+                return;
+            }
+
+            var img = (ProductImage)lvImages.SelectedItems[0].Tag;
+
+            var payload = new UpdateImageRequest
+            {
+                IsPrimary = chkPrimary.Checked,
+                Order = (int)numOrder.Value
+            };
+
+            string url = $"http://localhost:3001/api/product/{_product.pID}/image/{img.id}";
+            string json = JsonSerializer.Serialize(payload);
+            var resp = await _client.PutAsync(url, new StringContent(json, Encoding.UTF8, "application/json"));
+            var body = await resp.Content.ReadAsStringAsync();
+
+            if (!resp.IsSuccessStatusCode)
+            {
+                MessageBox.Show($"Hiba: {(int)resp.StatusCode}\n{body}");
+                return;
+            }
+
+            await RefreshImagesFromServer();
+        }
+
+        private async Task MoveSelectedAsync(int delta)
+        {
+            if (lvImages.SelectedItems.Count == 0) return;
+
+            var img = (ProductImage)lvImages.SelectedItems[0].Tag;
+            int newOrder = img.order + delta;
+            if (newOrder < 0) newOrder = 0;
+
+            // csak order-t update-eljük
+            var payload = new UpdateImageRequest
+            {
+                IsPrimary = img.isPrimary,
+                Order = newOrder
+            };
+
+            string url = $"http://localhost:3001/api/product/{_product.pID}/image/{img.id}";
+            string json = JsonSerializer.Serialize(payload);
+            var resp = await _client.PutAsync(url, new StringContent(json, Encoding.UTF8, "application/json"));
+            var body = await resp.Content.ReadAsStringAsync();
+
+            if (!resp.IsSuccessStatusCode)
+            {
+                MessageBox.Show($"Hiba: {(int)resp.StatusCode}\n{body}");
+                return;
+            }
+
+            await RefreshImagesFromServer();
+
+            // próbáljuk visszajelölni
+            foreach (ListViewItem it in lvImages.Items)
+            {
+                if (it.Text == img.id.ToString())
+                {
+                    it.Selected = true;
+                    it.Focused = true;
+                    it.EnsureVisible();
+                    break;
+                }
+            }
+        }
+
+        private static Image Base64ToImage(string base64)
+        {
+            if (string.IsNullOrWhiteSpace(base64)) return null;
+
+            // ha véletlen data:image/... lenne
+            int comma = base64.IndexOf(',');
+            if (comma != -1) base64 = base64.Substring(comma + 1);
+
+            byte[] bytes = Convert.FromBase64String(base64);
+            using (var ms = new MemoryStream(bytes))
+            {
+                return Image.FromStream(ms);
+            }
+        }
+
+        // ---------------- DTO-k ----------------
+
         private class UploadImageRequest
         {
-            public string data { get; set; }
-            public bool isPrimary { get; set; }
-            public int order { get; set; }
+            [JsonPropertyName("data")]
+            public string Data { get; set; }
+
+            [JsonPropertyName("isPrimary")]
+            public bool IsPrimary { get; set; }
+
+            [JsonPropertyName("order")]
+            public int Order { get; set; }
+        }
+
+        private class UpdateImageRequest
+        {
+            [JsonPropertyName("isPrimary")]
+            public bool IsPrimary { get; set; }
+
+            [JsonPropertyName("order")]
+            public int Order { get; set; }
+        }
+
+        private class SingleProductResponse
+        {
+            public bool success { get; set; }
+            public Product data { get; set; }
         }
     }
 

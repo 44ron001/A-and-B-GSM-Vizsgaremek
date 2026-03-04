@@ -102,17 +102,6 @@ namespace ABGSM
         public List<Product> data { get; set; }
     }
 
-    public class Product
-    {
-        public int pID { get; set; }
-        public string nev { get; set; }
-        public int ar { get; set; }
-        public string leiras { get; set; }
-        public int keszlet { get; set; }
-        public Dictionary<string, string> attributes { get; set; }
-        public List<ProductImage> images { get; set; }
-    }
-
     public class ProductImage
     {
         public int id { get; set; }
