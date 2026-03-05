@@ -11,10 +11,47 @@ function ProductDetails({ fallbackImage }) {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [selectedImage, setSelectedImage] = useState(0);
+	
+	
+const [token, setToken] = useState(null);
+const [showLogin, setShowLogin] = useState(false);
+
+
+useEffect(() => {
+  const savedToken = sessionStorage.getItem("token");
+  if (savedToken) setToken(savedToken);
+}, []);
 
 	useEffect(() => {
 		fetchProduct();
 	}, [productID]);
+
+
+const addToCart = async () => {
+  if (!token) {
+    setShowLogin(true);
+    return;
+  }
+
+  try {
+    await fetch("http://localhost:3001/api/cart", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        pID: product.pID,
+        darab: 1
+      })
+    });
+
+    alert("Termék hozzáadva a kosárhoz!");
+  } catch (err) {
+    alert("Hiba történt!");
+  }
+};
+
 
 	const fetchProduct = async () => {
 		try {
@@ -49,7 +86,7 @@ function ProductDetails({ fallbackImage }) {
 
 	return (
 		<div className='container'>
-			<Header />
+			<Header forceLoginPopup={showLogin} />
 
 			<div className='product-details'>
 				<button onClick={() => navigate(-1)}>← Vissza</button>
@@ -112,12 +149,13 @@ function ProductDetails({ fallbackImage }) {
 							</div>
 						</div>
 
-						<button
-							className='add-to-cart-btn'
-							disabled={product.keszlet === 0}
-						>
-							{product.keszlet > 0 ? 'Kosárba' : 'Elfogyott'}
-						</button>
+<button
+  className='add-to-cart-btn'
+  disabled={product.keszlet === 0}
+  onClick={addToCart}
+>
+  {product.keszlet > 0 ? 'Kosárba' : 'Elfogyott'}
+</button>
 					</div>
 				</div>
 			</div>

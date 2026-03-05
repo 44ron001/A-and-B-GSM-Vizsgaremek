@@ -9,3 +9,11 @@
 <a href="https://www.flaticon.com/free-icons/monitor" title="monitor icons">Monitor icons created by Freepik - Flaticon</a>
 
 <a href="https://www.flaticon.com/free-icons/user" title="user icons">User icons created by Phoenix Group - Flaticon</a>
+
+<a href="https://www.flaticon.com/free-icons/fan" title="fan icons">Fan icons created by Smashicons - Flaticon</a>
+
+<a href="https://www.flaticon.com/free-icons/hardware" title="hardware icons">Hardware icons created by kerismaker - Flaticon</a>
+
+<a href="https://www.flaticon.com/free-icons/power-supply" title="power supply icons">Power supply icons created by andinur - Flaticon</a>
+
+<a href="https://www.flaticon.com/free-icons/ram-memory" title="Ram Memory icons">Ram Memory icons created by Freepik - Flaticon</a>

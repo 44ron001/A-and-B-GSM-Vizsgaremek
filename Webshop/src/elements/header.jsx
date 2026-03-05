@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 
 
-function Header() {
+function Header({ forceLoginPopup }) {
 const navigate = useNavigate();
 const [searchTerm, setSearchTerm] = useState("");
 	
@@ -23,6 +23,16 @@ const [searchTerm, setSearchTerm] = useState("");
     telefon: "",
     lakcim: ""
   });
+  
+  
+useEffect(() => {
+  if (forceLoginPopup) {
+    resetForm();
+    setShowAuth(true);
+  }
+}, [forceLoginPopup]);
+  
+  
 
   // On mount, check if user is logged in
 useEffect(() => {
@@ -83,7 +93,7 @@ const resetForm = () => {
   });
 };
 
-  // Open profile popup & fetch latest profile from API
+
   const openProfilePopup = async () => {
     try {
       const res = await axios.get("http://localhost:3001/api/profile", {
@@ -112,7 +122,7 @@ const resetForm = () => {
   const updateProfile = async () => {
     try {
       const updateData = { ...form };
-      if (!form.password) delete updateData.password; // don't send empty password
+      if (!form.password) delete updateData.password; 
 
       const res = await axios.put(
         "http://localhost:3001/api/profile",
@@ -123,7 +133,7 @@ const resetForm = () => {
       );
 
       if (res.data.success) {
-        setUser(res.data.user); // update frontend state
+        setUser(res.data.user); 
         alert("Profile updated successfully!");
         closeProfilePopup();
       }
@@ -133,14 +143,14 @@ const resetForm = () => {
     }
   };
 
-  // Close popups with fade animation
+
 const closeAuthPopup = () => {
   setIsClosingAuth(true);
   setTimeout(() => {
     setShowAuth(false);
     setIsClosingAuth(false);
     setIsLogin(true);
-    resetForm();   // 👈 add this
+    resetForm();
   }, 300);
 };
 
@@ -158,7 +168,7 @@ const closeAuthPopup = () => {
       <header className='header'>
         <div className='header_container'>
           <div className='logo_container'>
-            <img className='logo_image' src='/src/images/logo.png' alt="logo" />
+            <img className='logo_image' src='/images/logo.png' alt="logo" />
             <p className='logo_name'>A&B GSM</p>
           </div>
 
@@ -180,7 +190,7 @@ const closeAuthPopup = () => {
             <div className='searchHolder'>
 <img
   className='searchIcon'
-  src='/src/images/search.png'
+  src='/images/search.png'
   alt="search"
   onClick={() => {
     if (searchTerm.trim().length > 1) {
@@ -193,10 +203,15 @@ const closeAuthPopup = () => {
 
           {user ? (
             <>
-              <img className='cart' src='/src/images/cart.png' alt="cart" />
+             <img
+  className='cart'
+  src='/images/cart.png'
+  alt="cart"
+  onClick={() => navigate("/cart")}
+/>
               <img
                 className='user'
-                src='/src/images/account.png'
+                src='/images/account.png'
                 alt="profile"
                 onClick={openProfilePopup}
               />
@@ -216,7 +231,7 @@ const closeAuthPopup = () => {
             <div className="popup_header">
               <h2>{isLogin ? "Login" : "Sign Up"}</h2>
               <div className='filler'></div>
-              <img src='/src/images/close.png' className="closeButton" onClick={closeAuthPopup} />
+              <img src='/images/close.png' className="closeButton" onClick={closeAuthPopup} />
             </div>
 
             {!isLogin && (
@@ -260,7 +275,7 @@ const closeAuthPopup = () => {
             <div className="popup_header">
               <h2>Profile</h2>
               <div className='filler'></div>
-              <img src='/src/images/close.png' className="closeButton" onClick={closeProfilePopup} />
+              <img src='/images/close.png' className="closeButton" onClick={closeProfilePopup} />
             </div>
 
             <p>Status: Logged in as <strong>{user.nev}</strong></p>

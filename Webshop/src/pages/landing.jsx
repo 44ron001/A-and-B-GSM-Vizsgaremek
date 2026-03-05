@@ -12,19 +12,19 @@ function Content() {
 					<img src="/images/slide1.jpg" id="slide1" className="slide" draggable="false"/>
 					<div id="slide_text1" className="slide_text s1">Videókártyák jó áron</div>
 					
-					<img src="/src/images/slide2.jpg" id="slide2" className="slide" draggable="false"/>
+					<img src="/images/slide2.jpg" id="slide2" className="slide" draggable="false"/>
 					<div id="slide_text2" className="slide_text s2">Processzorok jó áron</div>
 					
-					<img src="/src/images/slide3.jpg" id="slide3" className="slide" draggable="false"/>
+					<img src="/images/slide3.jpg" id="slide3" className="slide" draggable="false"/>
 					<div id="slide_text3" className="slide_text s3">Szabályzatok kidolgozása</div>
 					
-					<img src="/src/images/slide4.jpg" id="slide4" className="slide" draggable="false"/>
+					<img src="/images/slide4.jpg" id="slide4" className="slide" draggable="false"/>
 					<div id="slide_text4" className="slide_text s4">Adótanácsadás</div>
 					
-					<img src="/src/images/slide5.jpg" id="slide5" className="slide" draggable="false"/>
+					<img src="/images/slide5.jpg" id="slide5" className="slide" draggable="false"/>
 					<div id="slide_text5" className="slide_text s5">Cégalapítás és vállalati átvilágítás támogatása</div>
 					
-					<img src="/src/images/slide6.jpg" id="slide6" className="slide" draggable="false"/>
+					<img src="/images/slide6.jpg" id="slide6" className="slide" draggable="false"/>
 					<div id="slide_text6" className="slide_text s6">Solymászat Hungarikum</div>
 				</div>
 				<div className="nav">
@@ -44,35 +44,35 @@ function Content() {
 		<div className='content'>
 			<div className='category_list'>
 				<div className='category' onClick={() => navigate('/videocards')}>
-					<img className='category_image' src='/src/images/gpu.png'/>
+					<img className='category_image' src='/images/gpu.png'/>
 					<p className='category_name'>VIDEOCARDS</p>
 				</div>
 				<div className='category' onClick={() => navigate('/processors')}>
-					<img className='category_image' src='/src/images/cpu.png'/>
+					<img className='category_image' src='/images/cpu.png'/>
 					<p className='category_name'>PROCESSORS</p>
 				</div>
 				<div className='category' onClick={() => navigate('/pc-cases')}>
-					<img className='category_image' src='/src/images/pc.png'/>
+					<img className='category_image' src='/images/pc.png'/>
 					<p className='category_name'>PC CASES</p>
 				</div>
 				<div className='category' onClick={() => navigate('/monitors')}>
-					<img className='category_image' src='/src/images/monitor.png'/>
+					<img className='category_image' src='/images/monitor.png'/>
 					<p className='category_name'>MONITORS</p>
 				</div>
 				<div className='category' onClick={() => navigate('/motherboards')}>
-					<img className='category_image' src='/src/images/motherboard.png'/>
+					<img className='category_image' src='/images/motherboard.png'/>
 					<p className='category_name'>MOTHERBOARDS</p>
 				</div>
 				<div className='category' onClick={() => navigate('/psu')}>
-					<img className='category_image' src='/src/images/psu.png'/>
+					<img className='category_image' src='/images/psu.png'/>
 					<p className='category_name'>PSU</p>
 				</div>
 				<div className='category' onClick={() => navigate('/ram')}>
-					<img className='category_image' src='/src/images/memory.png'/>
+					<img className='category_image' src='/images/memory.png'/>
 					<p className='category_name'>RAM</p>
 				</div>
 				<div className='category' onClick={() => navigate('/coolers')}>
-					<img className='category_image' src='/src/images/cooler.png'/>
+					<img className='category_image' src='/images/cooler.png'/>
 					<p className='category_name'>COOLER</p>
 				</div>
 			</div>

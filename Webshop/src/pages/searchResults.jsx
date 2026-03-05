@@ -31,6 +31,9 @@ const getImageSrc = (imageData) => {
   
     <div className="search_page">
 	<Header/>
+	
+	<div className="search_container">
+		<div className="search_content">
       <h2>Search Results for "{name}"</h2>
 
       {products.length === 0 ? (
@@ -56,6 +59,9 @@ const getImageSrc = (imageData) => {
           ))}
         </div>
       )}
+	  </div>
+	  </div>
+	  
 	  <Footer/>
     </div>
 	

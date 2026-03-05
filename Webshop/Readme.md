@@ -3,8 +3,10 @@ A pc alkatrész weboldalunk található itt, nodejs + react + mysql backendel k�
 
 ## Hogyan kell futtatni:
 
-`cd Webshop` <= menjünk bele a projekt könyvtárába
+előtte a backend szervert és a MySQL-t is el kell indítani!
 
-`npm install` <= szükséges könyvtárak telepítése
+`build.bat` <= buildeljük a projektet
 
-`npm run dev` <= futtasuk lokális szerveren
+`run.bat` <= futtassuk a szervert
+
+[localhost:8080](http://localhost:8080) <= nyissuk meg a böngészőben

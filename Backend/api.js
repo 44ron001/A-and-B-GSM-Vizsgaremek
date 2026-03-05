@@ -3,482 +3,438 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const app = express();
 const PORT = 3001;
-
-
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
-const JWT_SECRET = "supersecretkey"; // later move to .env
+const JWT_SECRET = "supersecretkey";
 
 app.use(cors());
 app.use(express.json());
 
-const db = mysql.createConnection({host: '127.0.0.1', port: 3307, user: 'root', password: '', database: 'pcshop' });
-db.connect((err) => {
-	if (err) { console.error('Database connection failed:', err); return; }
-	console.log('Connected to MySQL database');
+
+const db = mysql.createConnection({
+  host: '127.0.0.1',
+  port: 3307,
+  user: 'root',
+  password: '',
+  database: 'pcshop'
 });
 
-app.get('/api/products/:categoryId', (req, res) => {
-	const categoryId = parseInt(req.params.categoryId);
-const query = `
-	SELECT p.pID, p.nev, p.ar, p.leiras, s.db as keszlet
-	FROM products p
-	LEFT JOIN stock s ON p.pID = s.pID
-	WHERE p.kID = ?
-	ORDER BY p.nev
-`;
+db.connect((err) => {
+  if (err) { console.error('Database connection failed:', err); return; }
+  console.log('Connected to MySQL database');
+});
 
-	db.query(query, [categoryId], (err, results) => {
-		if (err) {
-			console.error('Query error:', err);
-			return res.status(500).json({
-				success: false,
-				message: 'Database query failed'
-			});
-		}
-		const promises = results.map(product => {
-			return new Promise((resolve, reject) => {
-				const attrQuery = 'SELECT paramnev, ertek FROM product_attributes WHERE pID = ?';
-				db.query(attrQuery, [product.pID], (err, attrs) => {
-					if (err) {
-						reject(err);
-						return;
-					}
-					const attributes = {};
-					attrs.forEach(attr => {
-						attributes[attr.paramnev] = attr.ertek;
-					});
-					const imageQuery = 'SELECT imageID, image_data, is_primary, sorrend FROM product_images WHERE pID = ? ORDER BY is_primary DESC, sorrend ASC';
-					db.query(imageQuery, [product.pID], (err, images) => {
-						if (err) {
-							reject(err);
-							return;
-						}
-						resolve({
-							...product,
-							attributes,
-							images: images.map(img => ({
-								id: img.imageID,
-								data: img.image_data,
-								isPrimary: img.is_primary === 1,
-								order: img.sorrend
-							}))
-						});
-					});
-				});
-			});
-		});
-		Promise.all(promises)
-			.then(products => {
-				res.json({
-					success: true,
-					data: products
-				});
-			})
-			.catch(err => {
-				console.error('Error fetching product data:', err);
-				res.status(500).json({
-					success: false,
-					message: 'Error fetching product data'
-				});
-			});
-	});
+
+const dbPromise = db.promise();
+
+
+app.get('/api/products/:categoryId', (req, res) => {
+  const categoryId = parseInt(req.params.categoryId);
+  const query = `
+    SELECT p.pID, p.nev, p.ar, p.leiras, s.db as keszlet
+    FROM products p
+    LEFT JOIN stock s ON p.pID = s.pID
+    WHERE p.kID = ?
+    ORDER BY p.nev
+  `;
+
+  db.query(query, [categoryId], (err, results) => {
+    if (err) {
+      console.error('Query error:', err);
+      return res.status(500).json({ success: false, message: 'Database query failed' });
+    }
+
+    const promises = results.map(product => {
+      return new Promise((resolve, reject) => {
+        const attrQuery = 'SELECT paramnev, ertek FROM product_attributes WHERE pID = ?';
+        db.query(attrQuery, [product.pID], (err, attrs) => {
+          if (err) { reject(err); return; }
+
+          const attributes = {};
+          attrs.forEach(attr => { attributes[attr.paramnev] = attr.ertek; });
+
+          const imageQuery = 'SELECT imageID, image_data, is_primary, sorrend FROM product_images WHERE pID = ? ORDER BY is_primary DESC, sorrend ASC';
+          db.query(imageQuery, [product.pID], (err, images) => {
+            if (err) { reject(err); return; }
+            resolve({
+              ...product,
+              attributes,
+              images: images.map(img => ({
+                id: img.imageID,
+                data: img.image_data,
+                isPrimary: img.is_primary === 1,
+                order: img.sorrend
+              }))
+            });
+          });
+        });
+      });
+    });
+
+    Promise.all(promises)
+      .then(products => res.json({ success: true, data: products }))
+      .catch(err => {
+        console.error('Error fetching product data:', err);
+        res.status(500).json({ success: false, message: 'Error fetching product data' });
+      });
+  });
 });
 
 
 app.get('/api/product/:productID', (req, res) => {
-	const productID = parseInt(req.params.productID);
+  const productID = parseInt(req.params.productID);
+  if (isNaN(productID)) {
+    return res.status(400).json({ success: false, message: 'Invalid product ID' });
+  }
 
-	if (isNaN(productID)) {
-		return res.status(400).json({
-			success: false,
-			message: 'Invalid product ID'
-		});
-	}
+  const query = `
+    SELECT p.pID, p.nev, p.ar, p.leiras, p.kID, c.kategoriaNev, s.db as keszlet
+    FROM products p
+    LEFT JOIN categories c ON p.kID = c.kID
+    LEFT JOIN stock s ON p.pID = s.pID
+    WHERE p.pID = ?
+  `;
 
-	const query = `
-		SELECT 
-			p.pID,
-			p.nev,
-			p.ar,
-			p.leiras,
-			p.kID,
-			c.kategoriaNev,
-			s.db as keszlet
-		FROM products p
-		LEFT JOIN categories c ON p.kID = c.kID
-		LEFT JOIN stock s ON p.pID = s.pID
-		WHERE p.pID = ?
-	`;
+  db.query(query, [productID], (err, results) => {
+    if (err) {
+      console.error('Query error:', err);
+      return res.status(500).json({ success: false, message: 'Database query failed' });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
 
-	db.query(query, [productID], (err, results) => {
-		if (err) {
-			console.error('Query error:', err);
-			return res.status(500).json({
-				success: false,
-				message: 'Database query failed'
-			});
-		}
+    const product = results[0];
 
-		if (results.length === 0) {
-			return res.status(404).json({
-				success: false,
-				message: 'Product not found'
-			});
-		}
+    db.query('SELECT paramnev, ertek FROM product_attributes WHERE pID = ?', [productID], (err, attrs) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ success: false, message: 'Error fetching attributes' });
+      }
 
-		const product = results[0];
+      const attributes = {};
+      attrs.forEach(attr => { attributes[attr.paramnev] = attr.ertek; });
 
-		// Attribútumok lekérése
-		const attrQuery = `
-			SELECT paramnev, ertek 
-			FROM product_attributes 
-			WHERE pID = ?
-		`;
+      const imageQuery = `
+        SELECT imageID, image_data, is_primary, sorrend
+        FROM product_images
+        WHERE pID = ?
+        ORDER BY is_primary DESC, sorrend ASC
+      `;
 
-		db.query(attrQuery, [productID], (err, attrs) => {
-			if (err) {
-				console.error(err);
-				return res.status(500).json({
-					success: false,
-					message: 'Error fetching attributes'
-				});
-			}
+      db.query(imageQuery, [productID], (err, images) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ success: false, message: 'Error fetching images' });
+        }
 
-			const attributes = {};
-			attrs.forEach(attr => {
-				attributes[attr.paramnev] = attr.ertek;
-			});
-
-			// Képek lekérése
-			const imageQuery = `
-				SELECT imageID, image_data, is_primary, sorrend
-				FROM product_images
-				WHERE pID = ?
-				ORDER BY is_primary DESC, sorrend ASC
-			`;
-
-			db.query(imageQuery, [productID], (err, images) => {
-				if (err) {
-					console.error(err);
-					return res.status(500).json({
-						success: false,
-						message: 'Error fetching images'
-					});
-				}
-
-				res.json({
-					success: true,
-					data: {
-						...product,
-						attributes,
-						images: images.map(img => ({
-							id: img.imageID,
-							data: img.image_data,
-							isPrimary: img.is_primary === 1,
-							order: img.sorrend
-						}))
-					}
-				});
-			});
-		});
-	});
+        res.json({
+          success: true,
+          data: {
+            ...product,
+            attributes,
+            images: images.map(img => ({
+              id: img.imageID,
+              data: img.image_data,
+              isPrimary: img.is_primary === 1,
+              order: img.sorrend
+            }))
+          }
+        });
+      });
+    });
+  });
 });
-
-
-
 
 
 app.get('/api/search/:name', (req, res) => {
-	const searchTerm = req.params.name;
+  const searchTerm = req.params.name;
+  if (!searchTerm || searchTerm.length < 2) {
+    return res.status(400).json({ success: false, message: 'Search term too short' });
+  }
 
-	if (!searchTerm || searchTerm.length < 2) {
-		return res.status(400).json({
-			success: false,
-			message: 'Search term too short'
-		});
-	}
+  const query = `
+    SELECT
+      p.pID, p.nev, p.ar, p.leiras, s.db as keszlet,
+      (
+        MATCH(p.nev, p.leiras) AGAINST (? IN NATURAL LANGUAGE MODE) * 5 +
+        CASE WHEN p.nev LIKE ? THEN 10 ELSE 0 END +
+        CASE WHEN p.nev LIKE ? THEN 3 ELSE 0 END
+      ) AS relevance
+    FROM products p
+    LEFT JOIN stock s ON p.pID = s.pID
+    WHERE
+      MATCH(p.nev, p.leiras) AGAINST (? IN NATURAL LANGUAGE MODE)
+      OR p.nev LIKE ?
+      OR p.leiras LIKE ?
+    ORDER BY relevance DESC
+    LIMIT 50
+  `;
 
-	const query = `
-		SELECT 
-			p.pID,
-			p.nev,
-			p.ar,
-			p.leiras,
-			s.db as keszlet,
-			
-			-- Relevancia számítás
-			(
-				-- Fulltext súly
-				MATCH(p.nev, p.leiras) AGAINST (? IN NATURAL LANGUAGE MODE) * 5 +
-				
-				-- Pontos név egyezés
-				CASE 
-					WHEN p.nev LIKE ? THEN 10
-					ELSE 0
-				END +
-				
-				-- Részleges név egyezés
-				CASE 
-					WHEN p.nev LIKE ? THEN 3
-					ELSE 0
-				END
-				
-			) AS relevance
+  const fullLike = `%${searchTerm}%`;
 
-		FROM products p
-		LEFT JOIN stock s ON p.pID = s.pID
-		WHERE 
-			MATCH(p.nev, p.leiras) AGAINST (? IN NATURAL LANGUAGE MODE)
-			OR p.nev LIKE ?
-			OR p.leiras LIKE ?
-		ORDER BY relevance DESC
-		LIMIT 50
-	`;
+  db.query(query, [searchTerm, searchTerm, fullLike, searchTerm, fullLike, fullLike], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ success: false, message: 'Search failed' });
+    }
 
-	const fullLike = `%${searchTerm}%`;
-	const exactLike = searchTerm;
+    if (results.length === 0) {
+      return res.json({ success: true, data: [] });
+    }
 
-	db.query(
-		query,
-		[
-			searchTerm,
-			exactLike,
-			fullLike,
-			searchTerm,
-			fullLike,
-			fullLike
-		],
-		(err, results) => {
-			if (err) {
-				console.error(err);
-				return res.status(500).json({
-					success: false,
-					message: 'Search failed'
-				});
-			}
+    const promises = results.map(product => {
+      return new Promise((resolve, reject) => {
+        db.query('SELECT paramnev, ertek FROM product_attributes WHERE pID = ?', [product.pID], (err, attrs) => {
+          if (err) return reject(err);
 
-			if (results.length === 0) {
-				return res.json({
-					success: true,
-					data: []
-				});
-			}
+          const attributes = {};
+          attrs.forEach(attr => { attributes[attr.paramnev] = attr.ertek; });
 
-			// Attribútumok + képek hozzáadása
-			const promises = results.map(product => {
-				return new Promise((resolve, reject) => {
+          db.query(
+            'SELECT imageID, image_data, is_primary, sorrend FROM product_images WHERE pID = ? ORDER BY is_primary DESC, sorrend ASC',
+            [product.pID],
+            (err, images) => {
+              if (err) return reject(err);
+              resolve({
+                ...product,
+                attributes,
+                images: images.map(img => ({
+                  id: img.imageID,
+                  data: img.image_data,
+                  isPrimary: img.is_primary === 1,
+                  order: img.sorrend
+                }))
+              });
+            }
+          );
+        });
+      });
+    });
 
-					const attrQuery = `
-						SELECT paramnev, ertek
-						FROM product_attributes
-						WHERE pID = ?
-					`;
-
-					db.query(attrQuery, [product.pID], (err, attrs) => {
-						if (err) return reject(err);
-
-						const attributes = {};
-						attrs.forEach(attr => {
-							attributes[attr.paramnev] = attr.ertek;
-						});
-
-						const imageQuery = `
-							SELECT imageID, image_data, is_primary, sorrend
-							FROM product_images
-							WHERE pID = ?
-							ORDER BY is_primary DESC, sorrend ASC
-						`;
-
-						db.query(imageQuery, [product.pID], (err, images) => {
-							if (err) return reject(err);
-
-							resolve({
-								...product,
-								attributes,
-								images: images.map(img => ({
-									id: img.imageID,
-									data: img.image_data,
-									isPrimary: img.is_primary === 1,
-									order: img.sorrend
-								}))
-							});
-						});
-					});
-				});
-			});
-
-			Promise.all(promises)
-				.then(products => {
-					res.json({
-						success: true,
-						count: products.length,
-						data: products
-					});
-				})
-				.catch(err => {
-					console.error(err);
-					res.status(500).json({
-						success: false,
-						message: 'Error fetching product data'
-					});
-				});
-		}
-	);
+    Promise.all(promises)
+      .then(products => res.json({ success: true, count: products.length, data: products }))
+      .catch(err => {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Error fetching product data' });
+      });
+  });
 });
-
-
 
 
 app.post('/api/register', async (req, res) => {
-	const { nev, email, password } = req.body;
+  const { nev, email, password } = req.body;
+  if (!nev || !email || !password) {
+    return res.status(400).json({ success: false, message: "Missing fields" });
+  }
 
-	if (!nev || !email || !password) {
-		return res.status(400).json({ success: false, message: "Missing fields" });
-	}
-
-	try {
-		const hashedPassword = await bcrypt.hash(password, 10);
-
-		db.query(
-			'INSERT INTO users (nev, email, password) VALUES (?, ?, ?)',
-			[nev, email, hashedPassword],
-			(err) => {
-				if (err) {
-					return res.status(400).json({
-						success: false,
-						message: "Email already exists"
-					});
-				}
-
-				res.json({ success: true });
-			}
-		);
-	} catch (err) {
-		res.status(500).json({ success: false });
-	}
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    db.query(
+      'INSERT INTO users (nev, email, password) VALUES (?, ?, ?)',
+      [nev, email, hashedPassword],
+      (err) => {
+        if (err) return res.status(400).json({ success: false, message: "Email already exists" });
+        res.json({ success: true });
+      }
+    );
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
 });
-
 
 app.post('/api/login', (req, res) => {
-	const { email, password } = req.body;
+  const { email, password } = req.body;
 
-	db.query(
-		'SELECT * FROM users WHERE email = ?',
-		[email],
-		async (err, results) => {
-			if (err || results.length === 0) {
-				return res.status(401).json({
-					success: false,
-					message: "Invalid credentials"
-				});
-			}
+  db.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
+    if (err || results.length === 0) {
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
+    }
 
-			const user = results[0];
+    const user = results[0];
+    const match = await bcrypt.compare(password, user.password);
 
-			const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
+    }
 
-			if (!match) {
-				return res.status(401).json({
-					success: false,
-					message: "Invalid credentials"
-				});
-			}
+    const token = jwt.sign(
+      { userID: user.userID, status: user.status },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
-			const token = jwt.sign(
-				{ userID: user.userID, status: user.status },
-				JWT_SECRET,
-				{ expiresIn: "7d" }
-			);
-
-			res.json({
-				success: true,
-				token,
-				user: {
-					userID: user.userID,
-					nev: user.nev,
-					email: user.email,
-					status: user.status
-				}
-			});
-		}
-	);
+    res.json({
+      success: true,
+      token,
+      user: { userID: user.userID, nev: user.nev, email: user.email, status: user.status }
+    });
+  });
 });
-
 
 
 function authenticateToken(req, res, next) {
-	const authHeader = req.headers['authorization'];
-	const token = authHeader && authHeader.split(' ')[1];
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.sendStatus(401);
 
-	if (!token) return res.sendStatus(401);
-
-	jwt.verify(token, JWT_SECRET, (err, user) => {
-		if (err) return res.sendStatus(403);
-		req.user = user;
-		next();
-	});
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
 }
 
 
 app.get('/api/profile', authenticateToken, (req, res) => {
-	db.query(
-		'SELECT userID, nev, email, lakcim, telefon FROM users WHERE userID = ?',
-		[req.user.userID],
-		(err, results) => {
-			if (err || results.length === 0) {
-				return res.status(404).json({ success: false });
-			}
-			res.json({ success: true, data: results[0] });
-		}
-	);
+  db.query(
+    'SELECT userID, nev, email, lakcim, telefon FROM users WHERE userID = ?',
+    [req.user.userID],
+    (err, results) => {
+      if (err || results.length === 0) return res.status(404).json({ success: false });
+      res.json({ success: true, data: results[0] });
+    }
+  );
 });
 
 app.put('/api/profile', authenticateToken, async (req, res) => {
-	try {
-		const { nev, email, password, telefon, lakcim } = req.body;
+  try {
+    const { nev, email, password, telefon, lakcim } = req.body;
+    const updates = [];
+    const values = [];
 
-		// Prepare fields to update
-		const updates = [];
-		const values = [];
+    if (nev)    { updates.push('nev=?');     values.push(nev); }
+    if (email)  { updates.push('email=?');   values.push(email); }
+    if (telefon){ updates.push('telefon=?'); values.push(telefon); }
+    if (lakcim) { updates.push('lakcim=?');  values.push(lakcim); }
+    if (password) {
+      const hashed = await bcrypt.hash(password, 10);
+      updates.push('password=?');
+      values.push(hashed);
+    }
 
-		if (nev) { updates.push('nev=?'); values.push(nev); }
-		if (email) { updates.push('email=?'); values.push(email); }
-		if (telefon) { updates.push('telefon=?'); values.push(telefon); }
-		if (lakcim) { updates.push('lakcim=?'); values.push(lakcim); }
+    if (updates.length === 0) {
+      return res.status(400).json({ success: false, message: "No fields to update" });
+    }
 
-		if (password) {
-			const hashed = await bcrypt.hash(password, 10);
-			updates.push('password=?');
-			values.push(hashed);
-		}
+    values.push(req.user.userID);
+    const sql = `UPDATE users SET ${updates.join(', ')} WHERE userID=?`;
 
-		if (updates.length === 0) {
-			return res.status(400).json({ success: false, message: "No fields to update" });
-		}
+    db.query(sql, values, (err) => {
+      if (err) return res.status(500).json({ success: false, message: err.message });
 
-		values.push(req.user.userID); // for WHERE userID=?
-
-		const sql = `UPDATE users SET ${updates.join(', ')} WHERE userID=?`;
-
-		db.query(sql, values, (err) => {
-			if (err) return res.status(500).json({ success: false, message: err.message });
-
-			// Return updated user
-			db.query(
-				'SELECT userID, nev, email, telefon, lakcim FROM users WHERE userID=?',
-				[req.user.userID],
-				(err2, results) => {
-					if (err2 || results.length === 0) return res.status(500).json({ success: false });
-					res.json({ success: true, user: results[0] });
-				}
-			);
-		});
-	} catch (err) {
-		res.status(500).json({ success: false, message: err.message });
-	}
+      db.query(
+        'SELECT userID, nev, email, telefon, lakcim FROM users WHERE userID=?',
+        [req.user.userID],
+        (err2, results) => {
+          if (err2 || results.length === 0) return res.status(500).json({ success: false });
+          res.json({ success: true, user: results[0] });
+        }
+      );
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 });
+
+
+app.post("/api/cart", authenticateToken, async (req, res) => {
+  const userID = req.user.userID;
+  const { pID, darab } = req.body;
+  try {
+    await dbPromise.query(
+      `INSERT INTO cart_items (userID, pID, darab)
+       VALUES (?, ?, ?)
+       ON DUPLICATE KEY UPDATE darab = darab + ?`,
+      [userID, pID, darab || 1, darab || 1]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.get("/api/cart", authenticateToken, async (req, res) => {
+  const userID = req.user.userID;
+
+  try {
+    const [cartItems] = await dbPromise.query(`
+      SELECT c.pID, c.darab, p.nev, p.ar
+      FROM cart_items c
+      JOIN products p ON c.pID = p.pID
+      WHERE c.userID = ?
+    `, [userID]);
+
+    const promises = cartItems.map(item => {
+      return new Promise((resolve, reject) => {
+        db.query(
+          `SELECT imageID, image_data, is_primary, sorrend
+           FROM product_images
+           WHERE pID = ?
+           ORDER BY is_primary DESC, sorrend ASC`,
+          [item.pID],
+          (err, images) => {
+            if (err) return reject(err);
+
+            resolve({
+              ...item,
+              images: images.map(img => ({
+                id: img.imageID,
+                data: img.image_data,
+                isPrimary: img.is_primary === 1,
+                order: img.sorrend
+              }))
+            });
+          }
+        );
+      });
+    });
+
+    const fullCart = await Promise.all(promises);
+
+    res.json({ success: true, data: fullCart });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.put("/api/cart", authenticateToken, async (req, res) => {
+  const userID = req.user.userID;
+  const { pID, darab } = req.body;
+  try {
+    await dbPromise.query(
+      "UPDATE cart_items SET darab = ? WHERE userID = ? AND pID = ?",
+      [darab, userID, pID]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.delete("/api/cart/:pID", authenticateToken, async (req, res) => {
+  const userID = req.user.userID;
+  const { pID } = req.params;
+  try {
+    await dbPromise.query(
+      "DELETE FROM cart_items WHERE userID = ? AND pID = ?",
+      [userID, pID]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+
+
+
+
+
+
+
 
 app.put('/api/product/:productID', (req, res) => {
 	const productID = parseInt(req.params.productID);
@@ -773,5 +729,18 @@ app.delete('/api/product/:productID/image/:imageID', (req, res) => {
 	  });
 	});
   });
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 app.listen(PORT, () => { console.log(`Server running on http://localhost:${PORT}`); });
