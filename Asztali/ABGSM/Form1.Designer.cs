@@ -82,11 +82,11 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.label3.Location = new System.Drawing.Point(323, 131);
+            this.label3.Location = new System.Drawing.Point(343, 131);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(110, 25);
+            this.label3.Size = new System.Drawing.Size(65, 25);
             this.label3.TabIndex = 3;
-            this.label3.Text = "Username";
+            this.label3.Text = "Email";
             // 
             // textBox1
             // 
@@ -144,9 +144,9 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.exitToolStripMenuItem1,
             this.loginToolStripMenuItem,
-            this.menuToolStripMenuItem,
-            this.exitToolStripMenuItem1});
+            this.menuToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(768, 24);
@@ -173,28 +173,28 @@
             // cPUToolStripMenuItem
             // 
             this.cPUToolStripMenuItem.Name = "cPUToolStripMenuItem";
-            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
             this.cPUToolStripMenuItem.Text = "CPU";
             this.cPUToolStripMenuItem.Click += new System.EventHandler(this.cPUToolStripMenuItem_Click);
             // 
             // gPUToolStripMenuItem
             // 
             this.gPUToolStripMenuItem.Name = "gPUToolStripMenuItem";
-            this.gPUToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.gPUToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
             this.gPUToolStripMenuItem.Text = "GPU";
             this.gPUToolStripMenuItem.Click += new System.EventHandler(this.gPUToolStripMenuItem_Click);
             // 
             // pCCasesToolStripMenuItem
             // 
             this.pCCasesToolStripMenuItem.Name = "pCCasesToolStripMenuItem";
-            this.pCCasesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.pCCasesToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
             this.pCCasesToolStripMenuItem.Text = "PSU";
             this.pCCasesToolStripMenuItem.Click += new System.EventHandler(this.pCCasesToolStripMenuItem_Click);
             // 
             // ramToolStripMenuItem
             // 
             this.ramToolStripMenuItem.Name = "ramToolStripMenuItem";
-            this.ramToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.ramToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
             this.ramToolStripMenuItem.Text = "Ram";
             this.ramToolStripMenuItem.Click += new System.EventHandler(this.ramToolStripMenuItem_Click);
             // 

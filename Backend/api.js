@@ -285,6 +285,13 @@ function authenticateToken(req, res, next) {
   });
 }
 
+function requireAdmin(req, res, next) {
+  if (!req.user || req.user.status !== "admin") {
+    return res.status(403).json({ success: false, message: "Admin only" });
+  }
+  next();
+}
+
 
 app.get('/api/profile', authenticateToken, (req, res) => {
   db.query(
@@ -730,7 +737,102 @@ app.delete('/api/product/:productID/image/:imageID', (req, res) => {
 	});
   });
 
-
+  app.get('/api/admin/users', authenticateToken, requireAdmin, (req, res) => {
+    db.query(
+      `SELECT userID, nev, email, lakcim, telefon, status, ban
+       FROM users
+       ORDER BY userID`,
+      (err, results) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ success: false, message: 'Database error' });
+        }
+  
+        res.json({ success: true, data: results });
+      }
+    );
+  });
+  
+  app.get('/api/admin/users/:id/cart', authenticateToken, requireAdmin, (req, res) => {
+    const userID = parseInt(req.params.id);
+  
+    if (isNaN(userID)) {
+      return res.status(400).json({ success: false, message: 'Invalid user ID' });
+    }
+  
+    db.query(`
+      SELECT 
+        c.pID,
+        p.nev,
+        p.ar,
+        c.darab,
+        (p.ar * c.darab) AS osszeg
+      FROM cart_items c
+      JOIN products p ON c.pID = p.pID
+      WHERE c.userID = ?
+      ORDER BY p.nev
+    `, [userID], (err, results) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ success: false, message: 'Database error' });
+      }
+  
+      res.json({ success: true, data: results });
+    });
+  });
+  
+  app.get('/api/admin/users', authenticateToken, (req, res) => {
+    if (req.user.status !== "admin") {
+      return res.status(403).json({ success: false });
+    }
+  
+    db.query(
+      'SELECT userID, nev, email, status FROM users',
+      (err, results) => {
+        if (err) return res.status(500).json({ success: false });
+        res.json({ success: true, data: results });
+      }
+    );
+  });
+  
+  app.get('/api/admin/user/:id/cart', authenticateToken, (req, res) => {
+    if (req.user.status !== "admin") {
+      return res.status(403).json({ success: false });
+    }
+  
+    const userID = req.params.id;
+  
+    db.query(`
+      SELECT c.pID, p.nev, p.ar, c.darab
+      FROM cart_items c
+      JOIN products p ON c.pID = p.pID
+      WHERE c.userID = ?
+    `, [userID], (err, results) => {
+      if (err) return res.status(500).json({ success: false });
+      res.json({ success: true, data: results });
+    });
+  });
+  
+  app.get('/api/admin/user/:id/orders', authenticateToken, (req, res) => {
+    if (req.user.status !== "admin") {
+      return res.status(403).json({ success: false });
+    }
+  
+    const userID = req.params.id;
+  
+    db.query(`
+      SELECT o.orderID, o.datum, o.allapot,
+             SUM(oi.darab * oi.ar_akkor) as osszeg
+      FROM orders o
+      JOIN order_items oi ON o.orderID = oi.orderID
+      WHERE o.userID = ?
+      GROUP BY o.orderID, o.datum, o.allapot
+      ORDER BY o.datum DESC
+    `, [userID], (err, results) => {
+      if (err) return res.status(500).json({ success: false });
+      res.json({ success: true, data: results });
+    });
+  });
 
 
 

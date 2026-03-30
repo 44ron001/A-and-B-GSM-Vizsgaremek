@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Net.Http;
 using System.Text;
@@ -48,7 +50,7 @@ namespace ABGSM
 
             BuildUi();
             LoadDataToControls();
-            _ = RefreshImagesFromServer(); // betöltés
+            _ = RefreshImagesFromServer();
         }
 
         private void BuildUi()
@@ -59,7 +61,7 @@ namespace ABGSM
             MaximizeBox = false;
             MinimizeBox = false;
             ShowInTaskbar = false;
-            ClientSize = new System.Drawing.Size(820, 690);
+            ClientSize = new Size(820, 690);
 
             var padding = 12;
             int labelW = 110;
@@ -118,7 +120,6 @@ namespace ABGSM
             gridAttr.Columns.Add(new DataGridViewTextBoxColumn { Name = "KeyCol", HeaderText = "Kulcs" });
             gridAttr.Columns.Add(new DataGridViewTextBoxColumn { Name = "ValCol", HeaderText = "Érték" });
 
-            // --- KÉP FELTÖLTÉS + LISTA
             var lblImg = new Label { Text = "Képek:", Left = padding, Top = gridAttr.Bottom + 12, Width = labelW };
 
             btnChooseImage = new Button
@@ -165,7 +166,6 @@ namespace ABGSM
                 Maximum = 1000
             };
 
-            // előnézet
             picPreview = new PictureBox
             {
                 Left = padding + labelW + 10,
@@ -176,7 +176,6 @@ namespace ABGSM
                 SizeMode = PictureBoxSizeMode.Zoom
             };
 
-            // képlista
             lvImages = new ListView
             {
                 Left = picPreview.Right + 12,
@@ -194,11 +193,9 @@ namespace ABGSM
 
             btnUp = new Button { Text = "Fel", Left = lvImages.Left, Top = lvImages.Bottom + 6, Width = 60, Height = 28 };
             btnDown = new Button { Text = "Le", Left = btnUp.Right + 6, Top = btnUp.Top, Width = 60, Height = 28 };
-
             btnApplyImage = new Button { Text = "Kijelölt mentése", Left = btnDown.Right + 10, Top = btnUp.Top, Width = 140, Height = 28 };
             btnDeleteImage = new Button { Text = "Törlés", Left = btnApplyImage.Right + 10, Top = btnUp.Top, Width = 90, Height = 28 };
 
-            // mentés/mégse
             btnSave = new Button { Text = "Mentés", Width = 110, Height = 32 };
             btnCancel = new Button { Text = "Mégse", Width = 110, Height = 32 };
 
@@ -209,11 +206,14 @@ namespace ABGSM
             btnSave.Left = btnCancel.Left - 10 - btnSave.Width;
             btnSave.Top = btnTop;
 
-            // events
             btnChooseImage.Click += BtnChooseImage_Click;
             btnUploadImage.Click += async (s, e) => await UploadImageAsync();
             btnSave.Click += async (s, e) => await SaveAsync();
-            btnCancel.Click += (s, e) => { DialogResult = DialogResult.Cancel; Close(); };
+            btnCancel.Click += (s, e) =>
+            {
+                DialogResult = DialogResult.Cancel;
+                Close();
+            };
 
             lvImages.SelectedIndexChanged += LvImages_SelectedIndexChanged;
             btnDeleteImage.Click += async (s, e) => await DeleteSelectedImageAsync();
@@ -263,21 +263,27 @@ namespace ABGSM
             if (_product.attributes != null)
             {
                 foreach (var kv in _product.attributes)
+                {
                     gridAttr.Rows.Add(kv.Key, kv.Value);
+                }
             }
         }
 
         private Dictionary<string, string> ReadAttributesFromGrid()
         {
             var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
             foreach (DataGridViewRow row in gridAttr.Rows)
             {
                 if (row.IsNewRow) continue;
+
                 string key = row.Cells[0].Value?.ToString()?.Trim();
                 string val = row.Cells[1].Value?.ToString() ?? "";
+
                 if (string.IsNullOrWhiteSpace(key)) continue;
                 dict[key] = val;
             }
+
             return dict;
         }
 
@@ -332,8 +338,6 @@ namespace ABGSM
             }
         }
 
-        // ---------------- IMAGES ----------------
-
         private void BtnChooseImage_Click(object sender, EventArgs e)
         {
             using (var ofd = new OpenFileDialog())
@@ -341,11 +345,25 @@ namespace ABGSM
                 ofd.Filter = "Képek|*.jpg;*.jpeg;*.png;*.webp;*.bmp";
                 if (ofd.ShowDialog() != DialogResult.OK) return;
 
-                picPreview.ImageLocation = ofd.FileName;
+                try
+                {
+                    using (var original = Image.FromFile(ofd.FileName))
+                    using (var resized = ResizeImageKeepAspect(original, 500))
+                    {
+                        picPreview.Image?.Dispose();
+                        picPreview.Image = new Bitmap(resized);
 
-                byte[] bytes = File.ReadAllBytes(ofd.FileName);
-                _selectedImageBase64 = Convert.ToBase64String(bytes);
-                btnUploadImage.Enabled = true;
+                        _selectedImageBase64 = ImageToBase64(resized);
+                    }
+
+                    btnUploadImage.Enabled = true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Nem sikerült beolvasni a képet: " + ex.Message);
+                    _selectedImageBase64 = null;
+                    btnUploadImage.Enabled = false;
+                }
             }
         }
 
@@ -405,26 +423,57 @@ namespace ABGSM
             {
                 string url = $"http://localhost:3001/api/product/{_product.pID}";
                 var resp = await _client.GetAsync(url);
-                if (!resp.IsSuccessStatusCode) return;
 
-                var json = await resp.Content.ReadAsStringAsync();
-                var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                if (!resp.IsSuccessStatusCode)
+                {
+                    string body = await resp.Content.ReadAsStringAsync();
+                    MessageBox.Show($"Nem sikerült lekérni a képeket.\n\n{(int)resp.StatusCode} {resp.ReasonPhrase}\n{body}");
+                    return;
+                }
+
+                string json = await resp.Content.ReadAsStringAsync();
+
+                var opts = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+
                 var result = JsonSerializer.Deserialize<SingleProductResponse>(json, opts);
 
-                if (result?.success == true && result.data != null)
+                if (result == null)
                 {
-                    _product.images = result.data.images ?? new List<ProductImage>();
-                    LoadImagesToList();
+                    MessageBox.Show("A szerver válasza üres vagy hibás.");
+                    return;
                 }
+
+                if (!result.success || result.data == null)
+                {
+                    MessageBox.Show("A szerver nem adott vissza termékadatot.");
+                    return;
+                }
+
+                _product.images = result.data.images ?? new List<ProductImage>();
+                LoadImagesToList();
+
+                picPreview.Image?.Dispose();
+                picPreview.Image = null;
+                chkPrimary.Checked = false;
+                numOrder.Value = 0;
             }
-            catch { /* elég, ha nem crashel */ }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Hiba a képek frissítése közben: " + ex.Message);
+            }
         }
 
         private void LoadImagesToList()
         {
             lvImages.Items.Clear();
 
-            if (_product.images == null) _product.images = new List<ProductImage>();
+            if (_product.images == null)
+            {
+                _product.images = new List<ProductImage>();
+            }
 
             foreach (var img in _product.images)
             {
@@ -442,18 +491,16 @@ namespace ABGSM
 
             var img = (ProductImage)lvImages.SelectedItems[0].Tag;
 
-            // állítsuk be a szerkesztő mezőket is
             chkPrimary.Checked = img.isPrimary;
             numOrder.Value = img.order;
 
-            // preview base64-ből
             try
             {
+                picPreview.Image?.Dispose();
                 picPreview.Image = Base64ToImage(img.data);
             }
             catch
             {
-                // ha valamiért nem jó a base64, ne haljon meg
                 picPreview.Image = null;
             }
         }
@@ -522,7 +569,6 @@ namespace ABGSM
             int newOrder = img.order + delta;
             if (newOrder < 0) newOrder = 0;
 
-            // csak order-t update-eljük
             var payload = new UpdateImageRequest
             {
                 IsPrimary = img.isPrimary,
@@ -542,7 +588,6 @@ namespace ABGSM
 
             await RefreshImagesFromServer();
 
-            // próbáljuk visszajelölni
             foreach (ListViewItem it in lvImages.Items)
             {
                 if (it.Text == img.id.ToString())
@@ -555,22 +600,94 @@ namespace ABGSM
             }
         }
 
+        private static Image ResizeImageKeepAspect(Image original, int maxSize)
+        {
+            if (original == null) return null;
+
+            int originalWidth = original.Width;
+            int originalHeight = original.Height;
+
+            if (originalWidth <= 0 || originalHeight <= 0)
+            {
+                return new Bitmap(1, 1);
+            }
+
+            int newWidth;
+            int newHeight;
+
+            if (originalWidth >= originalHeight)
+            {
+                if (originalWidth <= maxSize)
+                {
+                    newWidth = originalWidth;
+                    newHeight = originalHeight;
+                }
+                else
+                {
+                    newWidth = maxSize;
+                    newHeight = (int)Math.Round(originalHeight * (maxSize / (double)originalWidth));
+                }
+            }
+            else
+            {
+                if (originalHeight <= maxSize)
+                {
+                    newWidth = originalWidth;
+                    newHeight = originalHeight;
+                }
+                else
+                {
+                    newHeight = maxSize;
+                    newWidth = (int)Math.Round(originalWidth * (maxSize / (double)originalHeight));
+                }
+            }
+
+            if (newWidth < 1) newWidth = 1;
+            if (newHeight < 1) newHeight = 1;
+
+            var resized = new Bitmap(newWidth, newHeight);
+
+            using (var g = Graphics.FromImage(resized))
+            {
+                g.CompositingQuality = CompositingQuality.HighQuality;
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.SmoothingMode = SmoothingMode.HighQuality;
+                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                g.DrawImage(original, 0, 0, newWidth, newHeight);
+            }
+
+            return resized;
+        }
+
+        private static string ImageToBase64(Image image)
+        {
+            if (image == null) return null;
+
+            using (var ms = new MemoryStream())
+            {
+                image.Save(ms, ImageFormat.Jpeg);
+                return Convert.ToBase64String(ms.ToArray());
+            }
+        }
+
         private static Image Base64ToImage(string base64)
         {
             if (string.IsNullOrWhiteSpace(base64)) return null;
 
-            // ha véletlen data:image/... lenne
             int comma = base64.IndexOf(',');
-            if (comma != -1) base64 = base64.Substring(comma + 1);
+            if (comma != -1)
+            {
+                base64 = base64.Substring(comma + 1);
+            }
 
             byte[] bytes = Convert.FromBase64String(base64);
             using (var ms = new MemoryStream(bytes))
+            using (var temp = Image.FromStream(ms))
             {
-                return Image.FromStream(ms);
+                return new Bitmap(temp);
             }
         }
-
-        // ---------------- DTO-k ----------------
 
         private class UploadImageRequest
         {
