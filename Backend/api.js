@@ -918,6 +918,152 @@ app.post('/api/checkout', authenticateToken, async (req, res) => {
   }
 });
 
+app.get('/api/admin/order/:orderID/details', authenticateToken, requireAdmin, (req, res) => {
+  const orderID = parseInt(req.params.orderID);
+
+  if (isNaN(orderID)) {
+    return res.status(400).json({ success: false, message: 'Invalid order ID' });
+  }
+
+  const orderQuery = `
+    SELECT o.orderID, o.userID, o.datum, o.allapot, p.fizID, pay.mivel
+    FROM orders o
+    LEFT JOIN payments pay ON o.fizID = pay.fizID
+    LEFT JOIN payments p ON o.fizID = p.fizID
+    WHERE o.orderID = ?
+    LIMIT 1
+  `;
+
+  db.query(orderQuery, [orderID], (err, orderRows) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ success: false, message: 'Database error' });
+    }
+
+    if (!orderRows || orderRows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    const itemsQuery = `
+      SELECT 
+        oi.orderItemID,
+        oi.pID,
+        p.nev,
+        oi.darab,
+        oi.ar_akkor,
+        (oi.darab * oi.ar_akkor) AS osszeg
+      FROM order_items oi
+      JOIN products p ON oi.pID = p.pID
+      WHERE oi.orderID = ?
+      ORDER BY p.nev
+    `;
+
+    db.query(itemsQuery, [orderID], (err, itemRows) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ success: false, message: 'Database error' });
+      }
+
+      res.json({
+        success: true,
+        data: {
+          ...orderRows[0],
+          items: itemRows || []
+        }
+      });
+    });
+  });
+});
+
+app.put('/api/admin/order/:orderID/status', authenticateToken, requireAdmin, (req, res) => {
+  const orderID = parseInt(req.params.orderID);
+  const { allapot } = req.body;
+
+  if (isNaN(orderID)) {
+    return res.status(400).json({ success: false, message: 'Invalid order ID' });
+  }
+
+  if (!allapot || typeof allapot !== 'string' || allapot.trim().length < 2) {
+    return res.status(400).json({ success: false, message: 'Invalid status' });
+  }
+
+  db.query(
+    'UPDATE orders SET allapot = ? WHERE orderID = ?',
+    [allapot.trim(), orderID],
+    (err, result) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ success: false, message: 'Database error' });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ success: false, message: 'Order not found' });
+      }
+
+      res.json({ success: true, message: 'Status updated' });
+    }
+  );
+});
+
+app.post('/api/admin/order/:orderID/ship', authenticateToken, requireAdmin, (req, res) => {
+  const orderID = parseInt(req.params.orderID);
+
+  if (isNaN(orderID)) {
+    return res.status(400).json({ success: false, message: 'Invalid order ID' });
+  }
+
+  db.query(
+    'UPDATE orders SET allapot = ? WHERE orderID = ?',
+    ['Kiszállítva', orderID],
+    (err, result) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ success: false, message: 'Database error' });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ success: false, message: 'Order not found' });
+      }
+
+      res.json({ success: true, message: 'Order shipped' });
+    }
+  );
+});
+
+app.get('/api/admin/user/:id/orders', authenticateToken, requireAdmin, (req, res) => {
+  const userID = req.params.id;
+
+  db.query(`
+    SELECT o.orderID, o.datum, o.allapot,
+           SUM(oi.darab * oi.ar_akkor) as osszeg
+    FROM orders o
+    JOIN order_items oi ON o.orderID = oi.orderID
+    WHERE o.userID = ?
+    GROUP BY o.orderID, o.datum, o.allapot
+    ORDER BY o.datum DESC
+  `, [userID], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ success: false, message: 'Database error' });
+    }
+
+    res.json({ success: true, data: results });
+  });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
