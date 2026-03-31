@@ -839,7 +839,84 @@ app.delete('/api/product/:productID/image/:imageID', (req, res) => {
 
 
 
+// GET payment methods
+app.get('/api/payments', authenticateToken, (req, res) => {
+  db.query('SELECT * FROM payments', (err, results) => {
+    if (err) return res.status(500).json({ success: false });
+    res.json({ success: true, data: results });
+  });
+});
 
+// POST checkout
+app.post('/api/checkout', authenticateToken, async (req, res) => {
+  const userID = req.user.userID;
+  const { szallitasiCim, fizetesiMod, saveAddress } = req.body;
+
+  if (!szallitasiCim || !fizetesiMod) {
+    return res.status(400).json({ success: false, message: 'Missing fields' });
+  }
+
+  try {
+    // Get cart items
+    const [cartItems] = await dbPromise.query(
+      `SELECT c.pID, c.darab, p.ar FROM cart_items c
+       JOIN products p ON c.pID = p.pID
+       WHERE c.userID = ?`,
+      [userID]
+    );
+
+    if (cartItems.length === 0) {
+      return res.status(400).json({ success: false, message: 'Cart is empty' });
+    }
+
+    // Find or create payment
+    const [payRows] = await dbPromise.query(
+      'SELECT fizID FROM payments WHERE mivel = ? LIMIT 1',
+      [fizetesiMod]
+    );
+
+    let fizID;
+    if (payRows.length > 0) {
+      fizID = payRows[0].fizID;
+    } else {
+      const [ins] = await dbPromise.query(
+        'INSERT INTO payments (mivel, fizetve) VALUES (?, 0)',
+        [fizetesiMod]
+      );
+      fizID = ins.insertId;
+    }
+
+    // Create order
+    const [orderResult] = await dbPromise.query(
+      `INSERT INTO orders (userID, fizID, allapot) VALUES (?, ?, 'Feldolgozás alatt')`,
+      [userID, fizID]
+    );
+    const orderID = orderResult.insertId;
+
+    // Insert order items
+    const itemValues = cartItems.map(i => [orderID, i.pID, i.darab, i.ar]);
+    await dbPromise.query(
+      'INSERT INTO order_items (orderID, pID, darab, ar_akkor) VALUES ?',
+      [itemValues]
+    );
+
+    // Save address if requested
+    if (saveAddress && szallitasiCim) {
+      await dbPromise.query(
+        'UPDATE users SET lakcim = ? WHERE userID = ?',
+        [szallitasiCim, userID]
+      );
+    }
+
+    // Clear cart
+    await dbPromise.query('DELETE FROM cart_items WHERE userID = ?', [userID]);
+
+    res.json({ success: true, orderID });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
 
 
 
