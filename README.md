@@ -1,3 +1,8 @@
+### Ha esetleg nehezedre esne telepíteni:
+[LIVE DEMO - netlify.com](https://steady-taffy-138f9b.netlify.app/)
+
+[Online backend (néha fel kell ébreszteni mert ingyenes)](https://a-and-b-gsm-vizsgaremek.onrender.com/api/products/1)
+
 # A&B GSM
 ## Infó
 ### Készítők
