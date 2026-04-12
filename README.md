@@ -7,6 +7,68 @@
 ### Célcsoport
 - Webshopunk sok célcsoportot kiszolgálhat, mint például: Gamerek, Crypto bányászok, cégek.
 
+
+
+## Hogyan futtassuk a projektet
+
+### 1. Adatbázis és szerverek indítása
+
+1. Indítsd el a **MySQL** szervert.
+2. Indítsd el az **Apache** szervert.
+3. Győződj meg róla, hogy a MySQL portja (pl. 3307) és a `pcshop` adatbázis létezik a konfiguráció szerint.
+4. Ha nem létezik futtasd le az "a&b.sql" fájlt az Adatbazis mappából.
+---
+
+### 2. Backend futtatása
+
+1. Nyisd meg a terminált vagy fájlkezelőt a **backend** mappában.
+2. Futtasd az `init.bat` fájlt.
+3. Futtasd a `run.bat` fájlt.
+
+```bat
+init.bat
+run.bat
+```
+
+* Ez elindítja az **api.js** szervert a `http://localhost:3001` címen.
+
+---
+
+### 3. Webshop frontend futtatása
+
+1. Nyisd meg a terminált a **webshop** mappában.
+2. Először futtad az init-et:
+
+```bat
+init.bat
+```
+
+3. Aztán futtasd a build-et:
+```bat
+build.bat
+```
+
+3. Végül indítsd a frontend szervert:
+
+```bat
+run.bat
+```
+
+* Alapértelmezett port: `http://localhost:8080`
+
+---
+
+### 4. Böngészőben való használat
+
+* Nyisd meg a böngészőt és navigálj ide:
+
+```
+http://localhost:8080
+```
+
+---
+
+
 ## Adatbázis 1.0
 ![Diagram](/adatbazis/diagram.jpg)
 
@@ -205,61 +267,4 @@
 
 
 
-## Hogyan futtassuk a projektet
 
-### 1. Adatbázis és szerverek indítása
-
-1. Indítsd el a **MySQL** szervert.
-2. Indítsd el az **Apache** szervert.
-3. Győződj meg róla, hogy a MySQL portja (pl. 3307) és a `pcshop` adatbázis létezik a konfiguráció szerint.
-4. Ha nem létezik futtasd le az "a&b.sql" fájlt az Adatbazis mappából.
----
-
-### 2. Backend futtatása
-
-1. Nyisd meg a terminált vagy fájlkezelőt a **backend** mappában.
-2. Futtasd az `init.bat` fájlt.
-3. Futtasd a `run.bat` fájlt.
-
-```bat
-init.bat
-run.bat
-```
-
-* Ez elindítja az **api.js** szervert a `http://localhost:3001` címen.
-
----
-
-### 3. Webshop frontend futtatása
-
-1. Nyisd meg a terminált a **webshop** mappában.
-2. Először futtad az init-et:
-
-```bat
-init.bat
-```
-
-3. Aztán futtasd a build-et:
-```bat
-build.bat
-```
-
-3. Végül indítsd a frontend szervert:
-
-```bat
-run.bat
-```
-
-* Alapértelmezett port: `http://localhost:8080`
-
----
-
-### 4. Böngészőben való használat
-
-* Nyisd meg a böngészőt és navigálj ide:
-
-```
-http://localhost:8080
-```
-
----
