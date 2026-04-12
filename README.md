@@ -23,6 +23,7 @@
 
 1. Nyisd meg a terminált vagy fájlkezelőt a **Backend** mappában.
 2. Futtasd a `Run.bat` fájlt.
+3. Ide írd be a MYSQL portját amit meg jegyeztél.
 
 * Ez elindítja az **api.js** szervert a `http://localhost:3001` címen.
 
