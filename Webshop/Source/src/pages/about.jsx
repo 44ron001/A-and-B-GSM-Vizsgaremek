@@ -93,7 +93,7 @@ const prevSlide = () => {
 	
 		<div className="slideshow_container">
 			<div className="">
-				<Navs selected="home" />
+				<Navs selected="about" />
 				<Menu/>
 			</div>
 
@@ -138,119 +138,73 @@ const prevSlide = () => {
 			
 		</div>
 
-
-
-
 <div className="landing_content">
 
-  {products[0]?.images?.length > 0 && (
-    <div onClick={() => navigate("/product/3")} className="landing_hero_image">
-      <img src={getImageSrc(products[0].images[0].data)} alt={products[0].nev}
-      />
-    </div>
-  )}
-
-
-
-  <h1 onClick={() => navigate("/product/3")}>ASUS Dual GeForce RTX 5060</h1>
+  <h1 className="not">About This Project</h1>
 
   <p>
-    The <strong>ASUS Dual GeForce RTX 5060 8GB GDDR7 OC Edition</strong> is a next-generation graphics card designed for
-    smooth performance, efficient cooling, and reliable everyday gaming and creative workloads. It delivers modern GPU
-    power in a compact dual-fan design.
+    This webshop is a school project created as a <strong>final exam (vizsgaremek)</strong>. It is a non-profit
+    demonstration system built for educational purposes only.
   </p>
 
-  <h2>Who is it for?</h2>
+  <h2>Project Purpose</h2>
   <p>
-    This GPU is perfect for <strong>gamers, content creators, and everyday PC enthusiasts</strong> who want strong performance
-    without moving into extreme workstation pricing. It balances power efficiency, speed, and affordability.
+    The goal of this project is to demonstrate full-stack development skills, including frontend design,
+    backend API integration, database handling, and desktop application development.
   </p>
 
-  <h2>What can you use it for?</h2>
-  <ul>
-    <li>Modern AAA gaming at high settings</li>
-    <li>1080p and 1440p high-refresh gameplay</li>
-    <li>Video editing and content creation</li>
-    <li>Light AI and GPU-accelerated tasks</li>
-    <li>Streaming and multitasking setups</li>
-  </ul>
+  <h2>Attributions</h2>
 
-  <h2>Key Highlights</h2>
-  <ul>
-    <li>8GB next-gen GDDR7 memory</li>
-    <li>Factory OC with 2535 MHz clock speed</li>
-    <li>Dual-fan cooling system for stable thermals</li>
-    <li>8K resolution support (7680×4320)</li>
-    <li>Optimized for efficiency and quiet operation</li>
-  </ul>
+  <div className="about_item">
+    <h3>Mohacsek Áron</h3>
+    <p>
+      Responsible for frontend development, UI/UX design, graphics, logo design,
+      API integration, and database connection.
+    </p>
+  </div>
+
+  <div className="about_item">
+    <h3>Uhrin Bence</h3>
+    <p>
+      Developed the desktop application with full CRUD functionality, admin control system
+      for managing products and users, and contributed to backend API development.
+    </p>
+  </div>
+
+  <h2>Tools & Resources</h2>
+  <p>
+    Icons used in this project were provided by <strong>Flaticon</strong>.
+  </p>
+
+  <h2>School Information</h2>
+  <p>
+    Logiker School<br />
+    Szörény utca 2-4
+  </p>
+
+  <h2>Usage Policy</h2>
+  <p>
+    This project may appear to be open-source in structure, however it is strictly not licensed for public use.
+    It is intended only for educational evaluation by teachers as part of grading requirements.
+  </p>
 
   <p>
-    A solid, modern GPU choice for users who want great performance, efficiency, and ASUS reliability in a compact design.
+    Any form of copying, modification, redistribution, reuse of code, design, images, or any other assets
+    from this project is strictly prohibited.
   </p>
 
-  <button onClick={() => navigate("/product/3")} className="buy_link order_button">
-    View Product & Buy
-  </button>
+  <p>
+    This includes, but is not limited to, frontend design, backend logic, database structure, UI elements,
+    and all visual or functional components of the system.
+  </p>
+
+  <h2>Disclaimer</h2>
+  <p>
+    This is a non-commercial educational project and is not intended for real-world business use.
+    All data and functionality are for demonstration purposes only.
+  </p>
+
 </div>
-
-
-
-		
-<div className="landing_content">
-
-
-  {products[1]?.images?.length > 0 && (
-    <div onClick={() => navigate("/product/5")} className="landing_hero_image">
-      <img
-        src={getImageSrc(products[1].images[0].data)}
-        alt={products[1].nev}
-      />
-    </div>
-  )}
-
-  <h1 onClick={() => navigate("/product/5")}>{products[1]?.nev}</h1>
-
-
-
-  <p>
-    The <strong>PNY NVIDIA RTX PRO 6000 Blackwell Workstation Edition</strong> is a next-generation professional GPU designed for
-    extreme performance and demanding workloads. Built for creators, engineers, and AI professionals, this graphics card delivers
-    unmatched power for modern computing tasks.
-  </p>
-
-  <h2>Who is it for?</h2>
-  <p>
-    This GPU is ideal for professionals working in <strong>3D rendering, AI development, machine learning, simulation,
-    scientific computing, and high-end video production</strong>. It is not just a gaming card – it is engineered for
-    enterprise-level performance and reliability.
-  </p>
-
-  <h2>What can you use it for?</h2>
-  <ul>
-    <li>Advanced AI model training and inference</li>
-    <li>Complex 3D rendering and animation</li>
-    <li>Engineering simulations and CAD workloads</li>
-    <li>8K video editing and post-production</li>
-    <li>Data science and GPU-accelerated computing</li>
-  </ul>
-
-  <h2>Key Highlights</h2>
-  <ul>
-    <li>96 GB GDDR7 VRAM for massive workloads</li>
-    <li>Next-gen Blackwell architecture performance</li>
-    <li>8K resolution support (7680×4320)</li>
-    <li>Professional-grade stability and optimization</li>
-  </ul>
-
-  <p>
-    A recently arrived powerhouse GPU for professionals who demand the absolute best performance available on the market today.
-  </p>
-
-  <button className="order_button buy_link" onClick={() => navigate("/product/5")}>
-    View Product & Buy
-  </button>
-</div>
-		
 		
 		
 		

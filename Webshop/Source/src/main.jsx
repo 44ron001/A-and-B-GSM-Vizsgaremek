@@ -5,6 +5,11 @@ import '/src/styles.css'
 import Landing from '/src/pages/landing.jsx'
 import Products from '/src/pages/products.jsx'
 import ProductDetails from '/src/pages/productDetails.jsx'
+
+import Shipping from '/src/pages/shipping.jsx'
+import Contact from '/src/pages/contact.jsx'
+import About from '/src/pages/about.jsx'
+
 import SearchResults from '/src/pages/searchResults.jsx'
 import Cart from '/src/pages/cart.jsx'
 
@@ -13,14 +18,20 @@ createRoot(document.getElementById('root')).render(
 		<BrowserRouter>
 			<Routes>
 				<Route path="/" element={<Landing/>} />
-				<Route path="/videocards" element={<Products categoryId={2} categoryName="Videocards" fallbackImage="/images/gpu.png" />} />
-				<Route path="/processors" element={<Products categoryId={1} categoryName="Processors" fallbackImage="/images/cpu.png" />} />
-				<Route path="/motherboards" element={<Products categoryId={3} categoryName="Motherboards" fallbackImage="/images/motherboard.png" />} />
-				<Route path="/ram" element={<Products categoryId={4} categoryName="Memories" fallbackImage="/images/memory.png" />} />
-				<Route path="/psu" element={<Products categoryId={5} categoryName="Power supply units" fallbackImage="/images/psu.png" />} />
-				<Route path="/pc-cases" element={<Products categoryId={6} categoryName="PC Cases" fallbackImage="/images/pc.png" />} />
-				<Route path="/monitors" element={<Products categoryId={7} categoryName="Monitors" fallbackImage="/images/monitor.png" />} />
+				<Route path="/videocards" element={<Products categoryId={1} categoryName="Videocards" fallbackImage="/images/gpu.png" />} />
+				<Route path="/processors" element={<Products categoryId={2} categoryName="Processors" fallbackImage="/images/cpu.png" />} />
+				<Route path="/pc-cases" element={<Products categoryId={3} categoryName="PC Cases" fallbackImage="/images/pc.png" />} />
+				<Route path="/monitors" element={<Products categoryId={4} categoryName="Monitors" fallbackImage="/images/monitor.png" />} />
+				<Route path="/motherboards" element={<Products categoryId={5} categoryName="Motherboards" fallbackImage="/images/motherboard.png" />} />
+				<Route path="/psu" element={<Products categoryId={6} categoryName="Power supply units" fallbackImage="/images/psu.png" />} />
+				<Route path="/ram" element={<Products categoryId={7} categoryName="Memories" fallbackImage="/images/memory.png" />} />
 				<Route path="/coolers" element={<Products categoryId={8} categoryName="Coolers" fallbackImage="/images/cooler.png" />} />
+				
+				<Route path="/shipping" element={<Shipping/>}  />
+				<Route path="/contact" element={<Contact/>}  />
+				<Route path="/about" element={<About/>}  />
+				
+				
 				<Route path="/product/:productID" element={<ProductDetails/>}  />
 				<Route path="/search/:name" element={<SearchResults />} />
 				<Route path="/cart" element={<Cart />} />

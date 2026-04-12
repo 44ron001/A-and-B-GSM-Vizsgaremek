@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "/src/elements/header.jsx";
 import Footer from "/src/elements/footer.jsx";
+import Menu from '/src/elements/menu.jsx';
+import Navs from '/src/elements/navs.jsx';
 
 function Cart() {
   const [cart, setCart] = useState([]);
@@ -139,11 +141,20 @@ function Cart() {
   return (
     <div className="container">
       <Header />
-      <div className="cart_container">
-        <div className="cart_content">
-          <h1>Kosár</h1>
+      <div className="center">
+        <div className="slideshow_container">
+		
+		<div><Navs/><Menu selected="" /></div>
+	  <div className="right_content">
+		
+				<div className="title_container">
+					<img className='back_btn' src='/images/undo.png' alt="back" draggable="false" onClick={() => navigate(-1)}/>
+					<h1 className='page_title'>Cart</h1>
+				</div>
+		
+			<div className="cart_content">
           {cart.length === 0 && !orderSuccess ? (
-            <p>A kosár üres.</p>
+            <p className="empty">Your cart is empty.</p>
           ) : (
             <>
               {cart.map((item) => (
@@ -170,14 +181,15 @@ function Cart() {
                       updateQuantity(item.pID, Number(e.target.value))
                     }
                   />
-                  <button onClick={() => deleteItem(item.pID)}>Törlés</button>
+                  <button onClick={() => deleteItem(item.pID)}>Remove</button>
                 </div>
               ))}
-              <h2>Összesen: {total.toLocaleString("hu-HU")} Ft</h2>
-              <button onClick={openCheckout}>Rendelés leadása</button>
+              <h2>Total: {total.toLocaleString("hu-HU")} Ft</h2>
+              <button className='order_button' onClick={openCheckout}>Checkout</button>
             </>
           )}
         </div>
+      </div>
       </div>
 
       {/* ─── CHECKOUT POPUP ─── */}
@@ -191,17 +203,15 @@ function Cart() {
           <div className="checkout-modal">
             {orderSuccess ? (
               <div className="checkout-success">
-                <h2>✅ Rendelés sikeresen leadva!</h2>
-                <p>Rendelésazonosító: <strong>#{orderSuccess}</strong></p>
-                <p>Hamarosan felvesszük veled a kapcsolatot.</p>
-                <button onClick={() => { setShowCheckout(false); navigate("/"); }}>
-                  Vissza a főoldalra
-                </button>
+                <h2 className="aaa">Order submitted successfully!</h2>
+                <p>Order Number: <strong>#{orderSuccess}</strong></p>
+                <p>We will be in touch with you shortly.</p>
+                <button className='order_button' onClick={() => { setShowCheckout(false); navigate("/"); }}> Go back to main page</button>
               </div>
             ) : (
               <>
                 <div className="checkout-header">
-                  <h2>Rendelés leadása</h2>
+                  <h2>Submit order</h2>
                   <button
                     className="checkout-close"
                     onClick={() => setShowCheckout(false)}
@@ -218,16 +228,16 @@ function Cart() {
                     </div>
                   ))}
                   <div className="checkout-summary-total">
-                    <strong>Összesen:</strong>
+                    <strong>Total:</strong>
                     <strong>{total.toLocaleString("hu-HU")} Ft</strong>
                   </div>
                 </div>
 
                 <div className="checkout-form">
-                  <label>Szállítási cím</label>
+                  <label>Delivery address</label>
                   <input
                     type="text"
-                    placeholder="Irányítószám, város, utca, házszám"
+                    placeholder="ZIP Code, City, Street, House number"
                     value={form.szallitasiCim}
                     onChange={(e) =>
                       setForm((f) => ({ ...f, szallitasiCim: e.target.value }))
@@ -243,12 +253,10 @@ function Cart() {
                         setForm((f) => ({ ...f, saveAddress: e.target.checked }))
                       }
                     />
-                    <label htmlFor="saveAddress">
-                      Cím mentése következő vásárláshoz
-                    </label>
+                    <label htmlFor="saveAddress">Save address for future purchases</label>
                   </div>
 
-                  <label>Fizetési mód</label>
+                  <label>Payment method</label>
                   <div className="checkout-payment-options">
                     {paymentMethods.map((pm) => (
                       <label key={pm.fizID} className="checkout-payment-option">
@@ -269,11 +277,11 @@ function Cart() {
                   {error && <p className="checkout-error">{error}</p>}
 
                   <button
-                    className="checkout-submit"
+                    className="add-to-cart-btn"
                     onClick={handleCheckout}
                     disabled={loading}
                   >
-                    {loading ? "Feldolgozás..." : "Rendelés véglegesítése"}
+                    {loading ? "Processing..." : "Submit order"}
                   </button>
                 </div>
               </>
@@ -281,8 +289,10 @@ function Cart() {
           </div>
         </div>
       )}
-
+		
+		</div>
       <Footer />
+    
     </div>
   );
 }

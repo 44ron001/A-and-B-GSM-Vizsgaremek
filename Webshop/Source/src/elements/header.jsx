@@ -163,66 +163,20 @@ const closeAuthPopup = () => {
   };
 
   return (
-    <>
-      {/* HEADER */}
-      <header className='header'>
-        <div className='header_container'>
-          <div className='logo_container'>
-            <img className='logo_image' src='/images/logo.png' alt="logo" />
-            <p className='logo_name'>A&B GSM</p>
-          </div>
-
-          <div className='filler'></div>
-
-          <div className='searchContainer'>
-<input
-  type="search"
-  className="search"
-  placeholder="Search..."
-  value={searchTerm}
-  onChange={(e) => setSearchTerm(e.target.value)}
-  onKeyDown={(e) => {
-    if (e.key === "Enter" && searchTerm.trim().length > 1) {
-      navigate(`/search/${searchTerm}`);
-    }
-  }}
-/>
-            <div className='searchHolder'>
-<img
-  className='searchIcon'
-  src='/images/search.png'
-  alt="search"
-  onClick={() => {
-    if (searchTerm.trim().length > 1) {
-      navigate(`/search/${searchTerm}`);
-    }
-  }}
-/>
-            </div>
-          </div>
-
-          {user ? (
-            <>
-             <img
-  className='cart'
-  src='/images/cart.png'
-  alt="cart"
-  onClick={() => navigate("/cart")}
-/>
-              <img
-                className='user'
-                src='/images/account.png'
-                alt="profile"
-                onClick={openProfilePopup}
-              />
-            </>
-          ) : (
-            <button className='belepes' onClick={() => { resetForm();setShowAuth(true); }}>
-              Log in
-            </button>
-          )}
-        </div>
-      </header>
+<>
+<header className='header'>
+	<div className='header_container'>
+		<img onClick={() => navigate("/")} className='logo_image' src='/images/logo.png' alt="logo" draggable="false"/>
+		<div className='filler'></div>
+		<div className='search_container'>
+			<input type="search" className="search" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && searchTerm.trim().length > 1) { navigate(`/search/${searchTerm}`); } }} />
+			<div className='search_holder'>
+				<img className='search_icon' src='/images/search.png' alt="search" onClick={() => { if (searchTerm.trim().length > 1) { navigate(`/search/${searchTerm}`); }}} />
+			</div>
+		</div>
+		{user ? (<> <img className='cart' src='/images/cart.png' alt="cart" onClick={() => navigate("/cart")} /> <img className='user' src='/images/account.png' alt="profile" onClick={openProfilePopup} /> </> ) : ( <button className='belepes' onClick={() => { resetForm();setShowAuth(true); }}> Log in </button> )}
+	</div>
+</header>
 
       {/* LOGIN / REGISTER POPUP */}
       {showAuth && (
@@ -241,26 +195,26 @@ const closeAuthPopup = () => {
                 onChange={e => setForm({ ...form, nev: e.target.value })}
               />
             )}
-
+<h3></h3>
             <input
               placeholder="Email"
               value={form.email}
               onChange={e => setForm({ ...form, email: e.target.value })}
             />
-
+<h3></h3>
             <input
               type="password"
               placeholder="Password"
               value={form.password}
               onChange={e => setForm({ ...form, password: e.target.value })}
             />
-
+<h3></h3>
             <div className='loginContainer'>
-              <button onClick={isLogin ? handleLogin : handleRegister}>
+              <button className='order_button' onClick={isLogin ? handleLogin : handleRegister}>
                 {isLogin ? "Login" : "Register"}
               </button>
             </div>
-
+<h3></h3>
             <p className='infoLogin' style={{ cursor: "pointer" }} onClick={() => { resetForm(); setIsLogin(!isLogin); }}>
               {isLogin ? "No account? Register" : "Already have account? Login"}
             </p>
@@ -285,32 +239,34 @@ const closeAuthPopup = () => {
                 Name:
                 <input value={form.nev} onChange={e => setForm({ ...form, nev: e.target.value })}/>
               </label>
-
+<h3></h3>
               <label>
                 Email:
                 <input value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}/>
               </label>
-
+<h3></h3>
               <label>
                 Password:
                 <input type="password" placeholder="Enter new password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })}/>
               </label>
-
+<h3></h3>
               <label>
                 Phone:
                 <input value={form.telefon} onChange={e => setForm({ ...form, telefon: e.target.value })}/>
               </label>
+			  <h3></h3>
 
               <label>
                 Address (Lakcím):
                 <input className='utso' value={form.lakcim} onChange={e => setForm({ ...form, lakcim: e.target.value })}/>
               </label>
+			  <h3></h3>
             </div>
 
             <div className="profile_buttons">
-              <button onClick={updateProfile}>Save Changes</button>
+              <button className='order_button' onClick={updateProfile}>Save Changes</button>
 			  <div className='filler'></div>
-              <button onClick={logout}>Logout</button>
+              <button className='order_button' onClick={logout}>Logout</button>
             </div>
           </div>
         </div>

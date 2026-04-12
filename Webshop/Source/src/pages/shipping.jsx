@@ -93,7 +93,7 @@ const prevSlide = () => {
 	
 		<div className="slideshow_container">
 			<div className="">
-				<Navs selected="home" />
+				<Navs selected="shipping" />
 				<Menu/>
 			</div>
 
@@ -143,112 +143,54 @@ const prevSlide = () => {
 
 <div className="landing_content">
 
-  {products[0]?.images?.length > 0 && (
-    <div onClick={() => navigate("/product/3")} className="landing_hero_image">
-      <img src={getImageSrc(products[0].images[0].data)} alt={products[0].nev}
-      />
-    </div>
-  )}
-
-
-
-  <h1 onClick={() => navigate("/product/3")}>ASUS Dual GeForce RTX 5060</h1>
+  <h1 className="not">Shipping Information</h1>
 
   <p>
-    The <strong>ASUS Dual GeForce RTX 5060 8GB GDDR7 OC Edition</strong> is a next-generation graphics card designed for
-    smooth performance, efficient cooling, and reliable everyday gaming and creative workloads. It delivers modern GPU
-    power in a compact dual-fan design.
+    We aim to deliver your orders quickly, safely, and reliably. Below you can find all important details about our shipping process,
+    delivery times, and available options.
   </p>
 
-  <h2>Who is it for?</h2>
-  <p>
-    This GPU is perfect for <strong>gamers, content creators, and everyday PC enthusiasts</strong> who want strong performance
-    without moving into extreme workstation pricing. It balances power efficiency, speed, and affordability.
-  </p>
-
-  <h2>What can you use it for?</h2>
+  <h2>Delivery Options</h2>
   <ul>
-    <li>Modern AAA gaming at high settings</li>
-    <li>1080p and 1440p high-refresh gameplay</li>
-    <li>Video editing and content creation</li>
-    <li>Light AI and GPU-accelerated tasks</li>
-    <li>Streaming and multitasking setups</li>
+    <li>Standard Delivery (2–5 business days)</li>
+    <li>Express Delivery (1–2 business days)</li>
+    <li>Store Pickup (available in selected locations)</li>
   </ul>
 
-  <h2>Key Highlights</h2>
+  <h2>Processing Time</h2>
+  <p>
+    Orders are typically processed within <strong>24 hours</strong> after payment confirmation.
+    During busy periods or promotions, processing may take slightly longer.
+  </p>
+
+  <h2>Shipping Costs</h2>
   <ul>
-    <li>8GB next-gen GDDR7 memory</li>
-    <li>Factory OC with 2535 MHz clock speed</li>
-    <li>Dual-fan cooling system for stable thermals</li>
-    <li>8K resolution support (7680×4320)</li>
-    <li>Optimized for efficiency and quiet operation</li>
+    <li>Orders under 50,000 Ft: calculated at checkout</li>
+    <li>Orders over 50,000 Ft: free standard shipping</li>
+    <li>Express shipping: additional fee applies</li>
   </ul>
 
+  <h2>Delivery Areas</h2>
   <p>
-    A solid, modern GPU choice for users who want great performance, efficiency, and ASUS reliability in a compact design.
+    We currently ship across Hungary and selected EU countries. Availability and delivery times may vary depending on your location.
   </p>
 
-  <button onClick={() => navigate("/product/3")} className="buy_link order_button">
-    View Product & Buy
-  </button>
-</div>
-
-
-
-		
-<div className="landing_content">
-
-
-  {products[1]?.images?.length > 0 && (
-    <div onClick={() => navigate("/product/5")} className="landing_hero_image">
-      <img
-        src={getImageSrc(products[1].images[0].data)}
-        alt={products[1].nev}
-      />
-    </div>
-  )}
-
-  <h1 onClick={() => navigate("/product/5")}>{products[1]?.nev}</h1>
-
-
-
+  <h2>Order Tracking</h2>
   <p>
-    The <strong>PNY NVIDIA RTX PRO 6000 Blackwell Workstation Edition</strong> is a next-generation professional GPU designed for
-    extreme performance and demanding workloads. Built for creators, engineers, and AI professionals, this graphics card delivers
-    unmatched power for modern computing tasks.
+    Once your order has been shipped, you will receive a tracking number via email so you can follow your package in real time.
   </p>
 
-  <h2>Who is it for?</h2>
-  <p>
-    This GPU is ideal for professionals working in <strong>3D rendering, AI development, machine learning, simulation,
-    scientific computing, and high-end video production</strong>. It is not just a gaming card – it is engineered for
-    enterprise-level performance and reliability.
-  </p>
-
-  <h2>What can you use it for?</h2>
+  <h2>Important Notes</h2>
   <ul>
-    <li>Advanced AI model training and inference</li>
-    <li>Complex 3D rendering and animation</li>
-    <li>Engineering simulations and CAD workloads</li>
-    <li>8K video editing and post-production</li>
-    <li>Data science and GPU-accelerated computing</li>
-  </ul>
-
-  <h2>Key Highlights</h2>
-  <ul>
-    <li>96 GB GDDR7 VRAM for massive workloads</li>
-    <li>Next-gen Blackwell architecture performance</li>
-    <li>8K resolution support (7680×4320)</li>
-    <li>Professional-grade stability and optimization</li>
+    <li>Delivery times are estimates and may vary due to courier delays</li>
+    <li>Make sure your shipping address is correct before placing an order</li>
+    <li>We are not responsible for delays caused by external courier services</li>
   </ul>
 
   <p>
-    A recently arrived powerhouse GPU for professionals who demand the absolute best performance available on the market today.
+    If you have any questions about shipping, feel free to contact our support team — we’re here to help!
   </p>
 
-  <button className="order_button buy_link" onClick={() => navigate("/product/5")}>
-    View Product & Buy
-  </button>
 </div>
 		
 		

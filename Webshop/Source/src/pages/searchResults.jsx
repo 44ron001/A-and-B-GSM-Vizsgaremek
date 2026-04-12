@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Header from '/src/elements/header.jsx';
 import Footer from '/src/elements/footer.jsx';
+import Menu from '/src/elements/menu.jsx';
+import Navs from '/src/elements/navs.jsx';
 
 function SearchResults() {
   const { name } = useParams();
@@ -14,6 +16,10 @@ const getImageSrc = (imageData) => {
   if (imageData.startsWith("data:image")) return imageData;
   return `data:image/jpeg;base64,${imageData}`;
 };
+
+	const formatPrice = (price) => {
+		return new Intl.NumberFormat('hu-HU').format(price) + ' Ft';
+	};
 
 
   useEffect(() => {
@@ -29,36 +35,46 @@ const getImageSrc = (imageData) => {
 
   return (
   
-    <div className="search_page">
+    <div className="container">
 	<Header/>
 	
-	<div className="search_container">
-		<div className="search_content">
-      <h2>Search Results for "{name}"</h2>
+	<div className="center">
+		<div className="slideshow_container">
+		<div><Navs/><Menu selected="" /></div>
+	  <div className="right_content">
+	  
+				<div className="title_container">
+					<img className='back_btn' src='/images/undo.png' alt="back" draggable="false" onClick={() => navigate(-1)}/>
+					<h1 className='page_title'>Search Results for: {name}</h1>
+				</div>
+	  
 
       {products.length === 0 ? (
         <p>No products found.</p>
       ) : (
-        <div className="search_grid">
+        <div className="products-grid">
           {products.map((product) => (
-            <div
-              key={product.pID}
-              className="search_card"
-              onClick={() => navigate(`/product/${product.pID}`)}
-            >
-{product.images?.[0] && (
-  <img
-    src={getImageSrc(product.images[0].data)}
-    alt={product.nev}
-  />
-)}
+            <div key={product.pID} className="product-card" onClick={() => navigate(`/product/${product.pID}`)} >
+			{product.images?.[0] && ( <img src={getImageSrc(product.images[0].data)} alt={product.nev} />)}
+				<div className='product-info'>
+              <h3 className='product-name'>{product.nev}</h3>
+			  <p className='product-description short'> {product.leiras.length > 60 ? product.leiras.substring(0, 60) + '...' : product.leiras} </p>
+              
+			  
+				<div className='product-footer'>
+					<div className='product-stock'> {product.keszlet > 0 ? ( <span className='in-stock'>In Stock</span> ) : ( <span className='out-of-stock'>Nincs raktáron</span> )} </div>
+					<div className='product-price'> {formatPrice(product.ar)} </div>
+				</div>
+			  
+			  </div>
+			  
 
-              <h3>{product.nev}</h3>
-              <p>{product.ar} Ft</p>
+			  
             </div>
           ))}
         </div>
       )}
+	  </div>
 	  </div>
 	  </div>
 	  

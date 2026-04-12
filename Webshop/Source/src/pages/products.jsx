@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '/src/elements/header.jsx';
 import Footer from '/src/elements/footer.jsx';
+import Menu from '/src/elements/menu.jsx';
+import Navs from '/src/elements/navs.jsx';
 
 function Products({ categoryId, categoryName, fallbackImage }) {
 	const [products, setProducts] = useState([]);
@@ -77,71 +79,35 @@ function Products({ categoryId, categoryName, fallbackImage }) {
 			</div>
 		);
 	}
-
-	return (
-		<div className='container'>
-			<Header />
-			<div className='center'>
-				<div className='content'>
-					<h1 className='page-title'>{categoryName}</h1>
-					<div className='products-grid'>
-						{products.length === 0 ? (
-							<p>Nincs elérhető termék ebben a kategóriában.</p>
-						) : (
-products.map(product => (
-	<div 
-		key={product.pID} 
-		className='product-card preview'
-		onClick={() => navigate(`/product/${product.pID}`)}
-		style={{ cursor: 'pointer' }}
-	>
-		<div className='product-image'>
-			{product.images && product.images.length > 0 ? (
-				<img 
-					src={getImageSrc(product.images[0].data)} 
-					alt={product.nev} 
-				/>
-			) : (
-				<img src={fallbackImage} alt={product.nev} />
-			)}
-		</div>
-
-		<div className='product-info'>
-			<h3 className='product-name'>{product.nev}</h3>
-
-			<p className='product-description short'>
-				{product.leiras.length > 60
-					? product.leiras.substring(0, 60) + '...'
-					: product.leiras}
-			</p>
-
-			<div className='product-footer'>
-				<div className='product-stock'>
-					{product.keszlet > 0 ? (
-						<span className='in-stock'>Raktáron</span>
-					) : (
-						<span className='out-of-stock'>Nincs raktáron</span>
-					)}
+return (
+<div className='container'>
+	<Header />
+	<div className='center'>
+		<div className="slideshow_container">
+			<div><Navs/><Menu selected={categoryName} /></div>
+			<div className="right_content">
+				<div className="title_container">
+					<img className='back_btn' src='/images/undo.png' alt="back" draggable="false" onClick={() => navigate(-1)}/>
+					<h1 className='page_title'>{categoryName}</h1>
 				</div>
-
-				<div className='product-price'>
-					{formatPrice(product.ar)}
+				<div className='products-grid'>
+					{products.length === 0 ? (<p>Nincs elérhető termék ebben a kategóriában.</p>) : (products.map(product => (<div key={product.pID} className='product-card preview' onClick={() => navigate(`/product/${product.pID}`)} style={{ cursor: 'pointer' }}>
+					<div className='product-image'> {product.images && product.images.length > 0 ? (<img src={getImageSrc(product.images[0].data)} alt={product.nev} />) : (<img src={fallbackImage} alt={product.nev} />)}</div>
+						<div className='product-info'>
+							<h3 className='product-name'>{product.nev}</h3>
+							<p className='product-description short'> {product.leiras.length > 60 ? product.leiras.substring(0, 60) + '...' : product.leiras} </p>
+							<div className='product-footer'>
+								<div className='product-stock'> {product.keszlet > 0 ? ( <span className='in-stock'>In Stock</span> ) : ( <span className='out-of-stock'>Nincs raktáron</span> )} </div>
+								<div className='product-price'> {formatPrice(product.ar)} </div>
+							</div>
+						</div>
+					</div>)))}
 				</div>
 			</div>
 		</div>
 	</div>
-))
-
-						)}
-					</div>
-					<button className='back-btn' onClick={() => navigate('/')}>
-						Vissza a főoldalra
-					</button>
-				</div>
-			</div>
-			<Footer />
-		</div>
-	);
+	<Footer/>
+</div>
+);
 }
-
 export default Products;

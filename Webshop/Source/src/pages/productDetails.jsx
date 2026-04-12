@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '/src/elements/header.jsx';
 import Footer from '/src/elements/footer.jsx';
+import Menu from '/src/elements/menu.jsx';
+import Navs from '/src/elements/navs.jsx';
 
 function ProductDetails({ fallbackImage }) {
 	const { productID } = useParams();
@@ -46,9 +48,9 @@ const addToCart = async () => {
       })
     });
 
-    alert("Termék hozzáadva a kosárhoz!");
+    alert("Item added to cart!");
   } catch (err) {
-    alert("Hiba történt!");
+    alert("Something went wrong!");
   }
 };
 
@@ -88,8 +90,19 @@ const addToCart = async () => {
 		<div className='container'>
 			<Header forceLoginPopup={showLogin} />
 
-			<div className='product-details'>
-				<button onClick={() => navigate(-1)}>← Vissza</button>
+			<div className='center'>
+			
+		<div className="slideshow_container">
+		<div><Navs/><Menu selected="" /></div>
+	  <div className="right_content">
+	  
+				<div className="title_container">
+					<img className='back_btn' src='/images/undo.png' alt="back" draggable="false" onClick={() => navigate(-1)}/>
+					<h1 className='page_title'>{product.nev}</h1>
+				</div>
+			
+			
+				
 
 				<div className='details-layout'>
 					{/* IMAGES */}
@@ -128,7 +141,7 @@ const addToCart = async () => {
 
 						{product.attributes && (
 							<div className='specs'>
-								<h3>Specifikáció</h3>
+								<h3>Specifications</h3>
 								{Object.entries(product.attributes).map(([key, value]) => (
 									<div key={key} className='spec-row'>
 										<strong>{key}:</strong> {value}
@@ -144,8 +157,8 @@ const addToCart = async () => {
 
 							<div className='stock'>
 								{product.keszlet > 0
-									? `Raktáron: ${product.keszlet} db`
-									: 'Nincs raktáron'}
+									? `${product.keszlet} in stock`
+									: 'Out of stock'}
 							</div>
 						</div>
 
@@ -154,10 +167,12 @@ const addToCart = async () => {
   disabled={product.keszlet === 0}
   onClick={addToCart}
 >
-  {product.keszlet > 0 ? 'Kosárba' : 'Elfogyott'}
+  {product.keszlet > 0 ? 'Add to cart' : 'Out of stock'}
 </button>
 					</div>
 				</div>
+			</div>
+			</div>
 			</div>
 
 			<Footer />
