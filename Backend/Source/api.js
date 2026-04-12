@@ -7,13 +7,20 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = "supersecretkey";
 
+const readline = require('readline');
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+rl.question('Kérem adja meg a MYSQL localhost portját: ', (ans) => {
+  rl.close();
+  const PORT2 = parseInt(ans) || 3007;
+
+
 app.use(cors());
 app.use(express.json());
 
 
 const db = mysql.createConnection({
   host: '127.0.0.1',
-  port: 3307,
+  port: PORT2,
   user: 'root',
   password: '',
   database: 'pcshop'
@@ -1069,3 +1076,5 @@ app.get('/api/admin/user/:id/orders', authenticateToken, requireAdmin, (req, res
 
 
 app.listen(PORT, () => { console.log(`Server running on http://localhost:${PORT}`); });
+
+});
