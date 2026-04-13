@@ -11,11 +11,9 @@ function Products({ categoryId, categoryName, fallbackImage }) {
 	const [error, setError] = useState(null);
 	const [selectedImages, setSelectedImages] = useState({});
 	const navigate = useNavigate();
-
 	useEffect(() => {
 		fetchProducts();
 	}, [categoryId]);
-
 	const fetchProducts = async () => {
 		try {
 			setLoading(true);
@@ -37,25 +35,21 @@ function Products({ categoryId, categoryName, fallbackImage }) {
 			setLoading(false);
 		}
 	};
-
 	const formatPrice = (price) => {
 		return new Intl.NumberFormat('hu-HU').format(price) + ' Ft';
 	};
-
 	const handleImageSelect = (productId, imageIndex) => {
 		setSelectedImages(prev => ({
 			...prev,
 			[productId]: imageIndex
 		}));
 	};
-
 	const getImageSrc = (imageData) => {
 		if (imageData.startsWith('data:image')) {
 			return imageData;
 		}
 		return `data:image/jpeg;base64,${imageData}`;
 	};
-
 	if (loading) {
 		return (
 			<div className='container'>
@@ -67,7 +61,6 @@ function Products({ categoryId, categoryName, fallbackImage }) {
 			</div>
 		);
 	}
-
 	if (error) {
 		return (
 			<div className='container'>

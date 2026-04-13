@@ -6,152 +6,124 @@ import Menu from '/src/elements/menu.jsx';
 import Navs from '/src/elements/navs.jsx';
 
 function Cart() {
-  const [cart, setCart] = useState([]);
-  const [token, setToken] = useState(null);
-  const [showCheckout, setShowCheckout] = useState(false);
-  const [paymentMethods, setPaymentMethods] = useState([]);
-  const [form, setForm] = useState({
-    szallitasiCim: "",
-    fizetesiMod: "",
-    saveAddress: false,
-  });
-  const [orderSuccess, setOrderSuccess] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const savedToken = sessionStorage.getItem("token");
-    if (savedToken) {
-      setToken(savedToken);
-      fetchCart(savedToken);
-    }
-  }, []);
-
-  const fetchCart = async (jwt) => {
-    const res = await fetch("http://localhost:3001/api/cart", {
-      headers: { Authorization: `Bearer ${jwt}` },
-    });
-    const data = await res.json();
-    if (data.success) setCart(data.data);
-  };
-
-  const fetchPaymentMethods = async (jwt) => {
-    const res = await fetch("http://localhost:3001/api/payments", {
-      headers: { Authorization: `Bearer ${jwt}` },
-    });
-    const data = await res.json();
-    if (data.success) {
-      setPaymentMethods(data.data);
-      if (data.data.length > 0) {
-        setForm((f) => ({ ...f, fizetesiMod: data.data[0].mivel }));
-      }
-    }
-  };
-
-  const fetchProfileAddress = async (jwt) => {
-    const res = await fetch("http://localhost:3001/api/profile", {
-      headers: { Authorization: `Bearer ${jwt}` },
-    });
-    const data = await res.json();
-    if (data.success && data.data.lakcim) {
-      setForm((f) => ({ ...f, szallitasiCim: data.data.lakcim }));
-    }
-  };
-
-  const openCheckout = async () => {
-    setError("");
-    setOrderSuccess(null);
-    await fetchPaymentMethods(token);
-    await fetchProfileAddress(token);
-    setShowCheckout(true);
-  };
-
-  const updateQuantity = async (pID, darab) => {
-    if (darab < 1) return;
-    await fetch("http://localhost:3001/api/cart", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ pID, darab }),
-    });
-    fetchCart(token);
-  };
-
-  const getImageSrc = (imageData) => {
-    if (!imageData) return "";
-    if (imageData.startsWith("data:image")) return imageData;
-    return `data:image/jpeg;base64,${imageData}`;
-  };
-
-  const deleteItem = async (pID) => {
-    await fetch(`http://localhost:3001/api/cart/${pID}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    fetchCart(token);
-  };
-
-  const handleCheckout = async () => {
-    if (!form.szallitasiCim.trim()) {
-      setError("Kérjük add meg a szállítási címet!");
-      return;
-    }
-    if (!form.fizetesiMod) {
-      setError("Kérjük válassz fizetési módot!");
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-
-    try {
-      const res = await fetch("http://localhost:3001/api/checkout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          szallitasiCim: form.szallitasiCim,
-          fizetesiMod: form.fizetesiMod,
-          saveAddress: form.saveAddress,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (data.success) {
-        setOrderSuccess(data.orderID);
-        setCart([]);
-      } else {
-        setError(data.message || "Hiba történt a rendelés leadásakor.");
-      }
-    } catch (e) {
-      setError("Szerverhiba. Kérjük próbáld újra.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const total = cart.reduce((sum, item) => sum + item.ar * item.darab, 0);
-
-  return (
+	const [cart, setCart] = useState([]);
+	const [token, setToken] = useState(null);
+	const [showCheckout, setShowCheckout] = useState(false);
+	const [paymentMethods, setPaymentMethods] = useState([]);
+	const [form, setForm] = useState({
+		szallitasiCim: "",
+		fizetesiMod: "",
+		saveAddress: false,
+	});
+	const [orderSuccess, setOrderSuccess] = useState(null);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState("");
+	const navigate = useNavigate();
+	useEffect(() => {
+		const savedToken = sessionStorage.getItem("token");
+		if (savedToken) {
+			setToken(savedToken);
+			fetchCart(savedToken);
+		}
+	}, []);
+	const fetchCart = async (jwt) => {
+		const res = await fetch("http://localhost:3001/api/cart", { headers: { Authorization: `Bearer ${jwt}` }, });
+		const data = await res.json();
+		if (data.success) setCart(data.data);
+	};
+	const fetchPaymentMethods = async (jwt) => {
+		const res = await fetch("http://localhost:3001/api/payments", { headers: { Authorization: `Bearer ${jwt}` }, });
+		const data = await res.json();
+		if (data.success) {
+			setPaymentMethods(data.data);
+			if (data.data.length > 0) {
+				setForm((f) => ({ ...f, fizetesiMod: data.data[0].mivel }));
+			}
+		}
+	};
+	const fetchProfileAddress = async (jwt) => {
+		const res = await fetch("http://localhost:3001/api/profile", { headers: { Authorization: `Bearer ${jwt}` }, });
+		const data = await res.json();
+		if (data.success && data.data.lakcim) {
+			setForm((f) => ({ ...f, szallitasiCim: data.data.lakcim }));
+		}
+	};
+	const openCheckout = async () => {
+		setError("");
+		setOrderSuccess(null);
+		await fetchPaymentMethods(token);
+		await fetchProfileAddress(token);
+		setShowCheckout(true);
+	};
+	const updateQuantity = async (pID, darab) => {
+		if (darab < 1) return;
+		await fetch("http://localhost:3001/api/cart", {
+			method: "PUT",
+			headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`, },
+			body: JSON.stringify({ pID, darab }),
+		});
+		fetchCart(token);
+	};
+	const getImageSrc = (imageData) => {
+		if (!imageData) return "";
+		if (imageData.startsWith("data:image")) return imageData;
+		return `data:image/jpeg;base64,${imageData}`;
+	};
+	const deleteItem = async (pID) => {
+		await fetch(`http://localhost:3001/api/cart/${pID}`, {
+			method: "DELETE",
+			headers: { Authorization: `Bearer ${token}` },
+		});
+		fetchCart(token);
+	};
+	const handleCheckout = async () => {
+		if (!form.szallitasiCim.trim()) {
+			setError("Kérjük add meg a szállítási címet!");
+			return;
+		}
+		if (!form.fizetesiMod) {
+			setError("Kérjük válassz fizetési módot!");
+			return;
+		}
+		setLoading(true);
+		setError("");
+		try {
+			const res = await fetch("http://localhost:3001/api/checkout", {
+				method: "POST",
+				headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`, },
+				body: JSON.stringify({
+					szallitasiCim: form.szallitasiCim,
+					fizetesiMod: form.fizetesiMod,
+					saveAddress: form.saveAddress,
+				}),
+			});
+			const data = await res.json();
+			if (data.success) {
+				setOrderSuccess(data.orderID);
+				setCart([]);
+			} else {
+				setError(data.message || "Hiba történt a rendelés leadásakor.");
+			}
+		} catch (e) {
+			setError("Szerverhiba. Kérjük próbáld újra.");
+		} finally {
+			setLoading(false);
+		}
+	};
+	const total = cart.reduce((sum, item) => sum + item.ar * item.darab, 0);
+	
+	
+	return (
     <div className="container">
       <Header />
       <div className="center">
         <div className="slideshow_container">
-		
 		<div><Navs/><Menu selected="" /></div>
-	  <div className="right_content">
-		
+			<div className="right_content">
 				<div className="title_container">
 					<img className='back_btn' src='/images/undo.png' alt="back" draggable="false" onClick={() => navigate(-1)}/>
 					<h1 className='page_title'>Cart</h1>
 				</div>
-		
 			<div className="cart_content">
           {cart.length === 0 && !orderSuccess ? (
             <p className="empty">Your cart is empty.</p>
@@ -191,15 +163,8 @@ function Cart() {
         </div>
       </div>
       </div>
-
-      {/* ─── CHECKOUT POPUP ─── */}
       {showCheckout && (
-        <div
-          className="checkout-overlay"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setShowCheckout(false);
-          }}
-        >
+        <div className="checkout-overlay" onClick={(e) => { if (e.target === e.currentTarget) setShowCheckout(false); }} >
           <div className="checkout-modal">
             {orderSuccess ? (
               <div className="checkout-success">
@@ -219,7 +184,6 @@ function Cart() {
                     ✕
                   </button>
                 </div>
-
                 <div className="checkout-summary">
                   {cart.map((item) => (
                     <div key={item.pID} className="checkout-summary-item">
@@ -243,7 +207,6 @@ function Cart() {
                       setForm((f) => ({ ...f, szallitasiCim: e.target.value }))
                     }
                   />
-
                   <div className="checkout-save-address">
                     <input
                       type="checkbox"
@@ -255,7 +218,6 @@ function Cart() {
                     />
                     <label htmlFor="saveAddress">Save address for future purchases</label>
                   </div>
-
                   <label>Payment method</label>
                   <div className="checkout-payment-options">
                     {paymentMethods.map((pm) => (
@@ -273,14 +235,8 @@ function Cart() {
                       </label>
                     ))}
                   </div>
-
                   {error && <p className="checkout-error">{error}</p>}
-
-                  <button
-                    className="add-to-cart-btn"
-                    onClick={handleCheckout}
-                    disabled={loading}
-                  >
+                  <button className="add-to-cart-btn" onClick={handleCheckout} disabled={loading}>
                     {loading ? "Processing..." : "Submit order"}
                   </button>
                 </div>
@@ -289,10 +245,8 @@ function Cart() {
           </div>
         </div>
       )}
-		
-		</div>
-      <Footer />
-    
+	</div>
+  <Footer />
     </div>
   );
 }

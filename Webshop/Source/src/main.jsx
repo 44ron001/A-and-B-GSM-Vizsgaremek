@@ -5,11 +5,9 @@ import '/src/styles.css'
 import Landing from '/src/pages/landing.jsx'
 import Products from '/src/pages/products.jsx'
 import ProductDetails from '/src/pages/productDetails.jsx'
-
 import Shipping from '/src/pages/shipping.jsx'
 import Contact from '/src/pages/contact.jsx'
 import About from '/src/pages/about.jsx'
-
 import SearchResults from '/src/pages/searchResults.jsx'
 import Cart from '/src/pages/cart.jsx'
 
@@ -26,12 +24,9 @@ createRoot(document.getElementById('root')).render(
 				<Route path="/psu" element={<Products categoryId={6} categoryName="Power supply units" fallbackImage="/images/psu.png" />} />
 				<Route path="/ram" element={<Products categoryId={7} categoryName="Memories" fallbackImage="/images/memory.png" />} />
 				<Route path="/coolers" element={<Products categoryId={8} categoryName="Coolers" fallbackImage="/images/cooler.png" />} />
-				
 				<Route path="/shipping" element={<Shipping/>}  />
 				<Route path="/contact" element={<Contact/>}  />
 				<Route path="/about" element={<About/>}  />
-				
-				
 				<Route path="/product/:productID" element={<ProductDetails/>}  />
 				<Route path="/search/:name" element={<SearchResults />} />
 				<Route path="/cart" element={<Cart />} />

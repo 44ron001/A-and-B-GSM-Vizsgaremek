@@ -8,53 +8,43 @@ import Navs from '/src/elements/navs.jsx';
 function ProductDetails({ fallbackImage }) {
 	const { productID } = useParams();
 	const navigate = useNavigate();
-
 	const [product, setProduct] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [selectedImage, setSelectedImage] = useState(0);
-	
-	
-const [token, setToken] = useState(null);
-const [showLogin, setShowLogin] = useState(false);
-
-
-useEffect(() => {
-  const savedToken = sessionStorage.getItem("token");
-  if (savedToken) setToken(savedToken);
-}, []);
-
+	const [token, setToken] = useState(null);
+	const [showLogin, setShowLogin] = useState(false);
+	useEffect(() => {
+	  const savedToken = sessionStorage.getItem("token");
+	  if (savedToken) setToken(savedToken);
+	}, []);
 	useEffect(() => {
 		fetchProduct();
 	}, [productID]);
+	const addToCart = async () => {
+	  if (!token) {
+		setShowLogin(true);
+		return;
+	  }
 
+	  try {
+		await fetch("http://localhost:3001/api/cart", {
+		  method: "POST",
+		  headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${token}`
+		  },
+		  body: JSON.stringify({
+			pID: product.pID,
+			darab: 1
+		  })
+		});
 
-const addToCart = async () => {
-  if (!token) {
-    setShowLogin(true);
-    return;
-  }
-
-  try {
-    await fetch("http://localhost:3001/api/cart", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        pID: product.pID,
-        darab: 1
-      })
-    });
-
-    alert("Item added to cart!");
-  } catch (err) {
-    alert("Something went wrong!");
-  }
-};
-
-
+		alert("Item added to cart!");
+	  } catch (err) {
+		alert("Something went wrong!");
+	  }
+	};
 	const fetchProduct = async () => {
 		try {
 			setLoading(true);
@@ -72,40 +62,28 @@ const addToCart = async () => {
 			setLoading(false);
 		}
 	};
-
 	const formatPrice = (price) => {
 		return new Intl.NumberFormat('hu-HU').format(price) + ' Ft';
 	};
-
 	const getImageSrc = (imageData) => {
 		if (imageData.startsWith('data:image')) return imageData;
 		return `data:image/jpeg;base64,${imageData}`;
 	};
-
 	if (loading) return <div>Betöltés...</div>;
 	if (error) return <div>Hiba: {error}</div>;
 	if (!product) return null;
-
 	return (
 		<div className='container'>
 			<Header forceLoginPopup={showLogin} />
-
 			<div className='center'>
-			
-		<div className="slideshow_container">
-		<div><Navs/><Menu selected="" /></div>
-	  <div className="right_content">
-	  
+			<div className="slideshow_container">
+			<div><Navs/><Menu selected="" /></div>
+			<div className="right_content">
 				<div className="title_container">
 					<img className='back_btn' src='/images/undo.png' alt="back" draggable="false" onClick={() => navigate(-1)}/>
 					<h1 className='page_title'>{product.nev}</h1>
 				</div>
-			
-			
-				
-
 				<div className='details-layout'>
-					{/* IMAGES */}
 					<div className='details-images'>
 						<div className='main-image'>
 							{product.images && product.images.length > 0 ? (
@@ -117,7 +95,6 @@ const addToCart = async () => {
 								<img src={fallbackImage} alt={product.nev} />
 							)}
 						</div>
-
 						{product.images && product.images.length > 1 && (
 							<div className='thumbnails'>
 								{product.images.map((img, index) => (
@@ -132,8 +109,6 @@ const addToCart = async () => {
 							</div>
 						)}
 					</div>
-
-					{/* INFO */}
 					<div className='details-info'>
 						<h1>{product.nev}</h1>
 
@@ -161,20 +136,12 @@ const addToCart = async () => {
 									: 'Out of stock'}
 							</div>
 						</div>
-
-<button
-  className='add-to-cart-btn'
-  disabled={product.keszlet === 0}
-  onClick={addToCart}
->
-  {product.keszlet > 0 ? 'Add to cart' : 'Out of stock'}
-</button>
+						<button className='add-to-cart-btn' disabled={product.keszlet === 0} onClick={addToCart} > {product.keszlet > 0 ? 'Add to cart' : 'Out of stock'} </button>
 					</div>
 				</div>
 			</div>
 			</div>
 			</div>
-
 			<Footer />
 		</div>
 	);
