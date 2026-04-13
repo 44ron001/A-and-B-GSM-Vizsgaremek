@@ -1,51 +1,67 @@
-### Ha esetleg nehezedre esne telepíteni:
-[LIVE DEMO - netlify.com](https://glittery-biscochitos-dd9822.netlify.app/)
-
-[Online backend (néha fel kell ébreszteni mert ingyenes)](https://a-and-b-gsm-vizsgaremek.onrender.com/api/products/1)
-
 # A&B GSM
-## Infó
+
+## Információk
+
 ### Készítők
-- Mohacsek Áron: **Frontend(reactjs) + Adatbázis(mysql) + Backend(nodejs)**
-- Uhrin Bence: **Alkalmazás(winforms) + Adatbázis(mysql) + Backend(nodejs)**
+
+* **Mohacsek Áron** – Frontend (React), Backend (Node.js), Adatbázis (MySQL), Dokumentáció
+* **Uhrin Bence** – Desktop alkalmazás (WinForms), Backend (Node.js), Adatbázis (MySQL), PPT
 
 ### Célcsoport
-- Webshopunk sok célcsoportot kiszolgálhat, mint például: Gamerek, Crypto bányászok, cégek.
+
+A webshop többféle felhasználót is kiszolgál, például:
+
+* Gamerek
+* Kriptobányászok
+* Cégek
+* Programozók
+* LLM-ek futtatása
 
 ---
 
-## Hogyan futtassuk a projektet
+## Projekt futtatása
+
+### Ha nem szeretnéd helyben telepíteni
+
+* **Live demo:** [https://glittery-biscochitos-dd9822.netlify.app/](https://glittery-biscochitos-dd9822.netlify.app/)
+* **Online backend:** [https://a-and-b-gsm-vizsgaremek.onrender.com/api/products/1](https://a-and-b-gsm-vizsgaremek.onrender.com/api/products/1)
+  *(Első betöltésnél előfordulhat, hogy fel kell “ébreszteni”, mert ingyenes hostingon fut.)*
+
+
 
 ### 1. Adatbázis és szerverek indítása
 
-1. Indítsd el a **MySQL** szervert.
-2. Indítsd el az **Apache** szervert.
-3. Jegyezd meg a MySQL portját (pl. 3307).
-4. Ha nem létezik még `pcshop` adatbázis futtasd le az "a&b.sql" fájlt az Adatbazis mappából.
----
-
-### 2. Backend futtatása
-
-1. Nyisd meg a terminált vagy fájlkezelőt a **Backend** mappában.
-2. Futtasd a `Run.bat` fájlt.
-3. Ide írd be a MYSQL portját amit meg jegyeztél.
-
-* Ez elindítja az **api.js** szervert a `http://localhost:3001` címen.
+1. Indítsd el a **MySQL** szervert
+2. Indítsd el az **Apache** szervert
+3. Jegyezd meg a MySQL portját (pl. `3307`)
+4. Ha még nem létezik a `pcshop` adatbázis, futtasd az `a&b.sql` fájlt az **Adatbazis** mappából
 
 ---
 
-### 3. Webshop frontend futtatása
+### 2. Backend indítása
 
-1. Nyisd meg a terminált vagy fájlkezelőt a **Webshop** mappában.
-2. Futtasd a `Run.bat` fájlt.
+1. Nyisd meg a terminált a **Backend** mappában
+2. Futtasd a `Run.bat` fájlt
+3. Add meg a MySQL portot
 
-* Alapértelmezett port: `http://localhost:8080`
+Ez elindítja az API szervert a következő címen:
+`http://localhost:3001`
 
 ---
 
-### 4. Böngészőben való használat
+### 3. Frontend indítása
 
-* Nyisd meg a böngészőt és navigálj ide:
+1. Nyisd meg a terminált a **Webshop** mappában
+2. Futtasd a `Run.bat` fájlt
+
+Alapértelmezett cím:
+`http://localhost:8080`
+
+---
+
+### 4. Használat
+
+Nyisd meg a böngészőt, majd navigálj ide:
 
 ```
 http://localhost:8080
