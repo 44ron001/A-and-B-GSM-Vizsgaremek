@@ -1849,14 +1849,14 @@ select {
   .right_content {
     width: 100%;
     max-width: 900px;
-    padding: 0 16px;
+    padding: 0 0px;
     box-sizing: border-box;
   }
 }
 
 
 /* ── 1024px: collapse the left sidebar layout ── */
-@media (max-width: 1024px) {
+@media (max-width: 1124px) {
   /* Landing page: stack sidebar + slideshow vertically */
   .slideshow_container {
     flex-direction: column;
