@@ -4,8 +4,8 @@
 
 ### Készítők
 
-* **Mohacsek Áron** – Frontend (React), Backend (Node.js), Adatbázis (MySQL), Dokumentáció
-* **Uhrin Bence** – Desktop alkalmazás (WinForms), Backend (Node.js), Adatbázis (MySQL), PPT
+* **Mohacsek Áron** - Frontend (React), Backend (Node.js), Adatbázis (MySQL), Dokumentáció
+* **Uhrin Bence** - Desktop alkalmazás (WinForms), Backend (Node.js), Adatbázis (MySQL), PPT
 
 ### Célcsoport
 
