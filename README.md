@@ -23,7 +23,7 @@ A webshop többféle felhasználót is kiszolgál, például:
 
 ### Ha nem szeretnéd helyben telepíteni
 
-* **Live demo:** [https://glittery-biscochitos-dd9822.netlify.app/](https://glittery-biscochitos-dd9822.netlify.app/)
+* **Live demo:** [https://glittery-biscochitos-dd9822.netlify.app/](https://lambent-cuchufli-edb5c2.netlify.app/)
 * **Online backend:** [https://a-and-b-gsm-vizsgaremek.onrender.com/api/products/1](https://a-and-b-gsm-vizsgaremek.onrender.com/api/products/1)
   *(Első betöltésnél előfordulhat, hogy fel kell “ébreszteni”, mert ingyenes hostingon fut.)*
 
