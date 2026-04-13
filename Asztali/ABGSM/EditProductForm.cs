@@ -26,7 +26,6 @@ namespace ABGSM
         private Button btnSave;
         private Button btnCancel;
 
-        // Feltöltés
         private PictureBox picPreview;
         private Button btnChooseImage;
         private Button btnUploadImage;
@@ -36,7 +35,6 @@ namespace ABGSM
 
         private string _selectedImageBase64;
 
-        // Képlista + kezelés
         private ListView lvImages;
         private Button btnDeleteImage;
         private Button btnApplyImage;
