@@ -3,6 +3,6 @@ A pc alkatrész rendelés és leltár kezelő alkalmazása található itt, kés
 
 ## Hogyan kell futtatni:
 
-`dotnet Asztali` <= menjünk bele a projekt könyvtárába
+Használd az .msi telepítőt!
 
-`dotnet run` <= alkalmazás indítása
+vagy Visual Studio 2022-ben nyisd meg a solution-t, és ott futtasd.
